@@ -1,0 +1,21 @@
+{
+  "name": "@mailuse/shared",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schemas": "./src/schemas.ts",
+    "./types": "./src/types.ts",
+    "./id": "./src/id.ts",
+    "./constants": "./src/constants.ts"
+  },
+  "dependencies": {
+    "nanoid": "^5.1.5",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@mailuse/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

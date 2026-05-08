@@ -1,0 +1,15 @@
+# mailuse Caddy reverse proxy configuration
+# Replace {$DOMAIN} with your actual domain
+
+inbox.{$DOMAIN} {
+  reverse_proxy web:3000
+}
+
+api.{$DOMAIN} {
+  reverse_proxy api:3000
+}
+
+# Optional: MinIO console
+# minio.{$DOMAIN} {
+#   reverse_proxy minio:9001
+# }
