@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.svelte-kit/
+
+# Prisma generated
+packages/db/prisma/generated/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Turbo
+.turbo/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# MinIO data (local dev)
+minio_data/
+postgres_data/
