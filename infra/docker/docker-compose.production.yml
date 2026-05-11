@@ -78,7 +78,8 @@ services:
       API_PORT: 3000
       PORT: 3000
       NODE_ENV: production
-      CORS_ORIGIN: ${CORS_ORIGIN:-https://inbox.${DOMAIN:-localhost}}
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://inbox.${DOMAIN:-localhost},https://dashboard.${DOMAIN:-localhost}}
+      OWNER_PASSWORD: ${OWNER_PASSWORD:-}
       STORAGE_ENDPOINT: http://minio:9000
       STORAGE_BUCKET: emails
       STORAGE_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
@@ -115,7 +116,8 @@ services:
       API_PORT: 3000
       PORT: 3000
       NODE_ENV: production
-      CORS_ORIGIN: ${CORS_ORIGIN:-https://inbox.${DOMAIN:-localhost}}
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://inbox.${DOMAIN:-localhost},https://dashboard.${DOMAIN:-localhost}}
+      OWNER_PASSWORD: ${OWNER_PASSWORD:-}
       STORAGE_ENDPOINT: http://minio:9000
       STORAGE_BUCKET: emails
       STORAGE_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
@@ -146,6 +148,11 @@ services:
       - traefik.http.routers.mailuse-web.tls=true
       - traefik.http.routers.mailuse-web.tls.certresolver=letsencrypt
       - traefik.http.services.mailuse-web.loadbalancer.server.port=3000
+      - traefik.http.routers.mailuse-dashboard.rule=Host(`dashboard.${DOMAIN:-localhost}`)
+      - traefik.http.routers.mailuse-dashboard.entrypoints=websecure
+      - traefik.http.routers.mailuse-dashboard.tls=true
+      - traefik.http.routers.mailuse-dashboard.tls.certresolver=letsencrypt
+      - traefik.http.routers.mailuse-dashboard.service=mailuse-web
     depends_on:
       - api
 

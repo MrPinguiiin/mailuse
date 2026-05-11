@@ -15,6 +15,7 @@ export const env = createEnv({
     PORT: z.coerce.number().default(3000),
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
     CORS_ORIGIN: z.string().default("http://localhost:5173"),
+    OWNER_PASSWORD: z.string().min(8).optional(),
 
     // Storage (S3/MinIO/R2)
     STORAGE_ENDPOINT: z.string().default("http://localhost:9000"),

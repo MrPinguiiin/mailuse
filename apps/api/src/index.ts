@@ -7,6 +7,7 @@ import { inboxRoutes } from "./routes/inboxes";
 import { emailRoutes } from "./routes/emails";
 import { domainRoutes } from "./routes/domains";
 import { healthRoutes } from "./routes/health";
+import { ownerRoutes } from "./routes/owner";
 import { compatibilityRoutes } from "./routes/compatibility";
 import { startCleanupJob } from "./jobs/cleanup";
 
@@ -18,9 +19,9 @@ app.use("*", requestId());
 app.use(
   "*",
   cors({
-    origin: env.CORS_ORIGIN,
+    origin: env.CORS_ORIGIN.split(",").map((origin) => origin.trim()),
     allowMethods: ["GET", "POST", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type"],
+    allowHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -29,6 +30,7 @@ app.route("/api/v1", healthRoutes);
 app.route("/api/v1", domainRoutes);
 app.route("/api/v1", inboxRoutes);
 app.route("/api/v1", emailRoutes);
+app.route("/api/v1", ownerRoutes);
 
 // Legacy-compatible API surface.
 app.route("/api", healthRoutes);

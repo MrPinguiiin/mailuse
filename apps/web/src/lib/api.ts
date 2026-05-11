@@ -23,6 +23,20 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json();
 }
 
+async function fetchOwnerJson<T>(path: string, token: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${BASE}/api/v1${path}`, {
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    ...init,
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: "Unknown error" }));
+    throw new Error(body.error || `HTTP ${res.status}`);
+  }
+
+  return res.json();
+}
+
 export const api = {
   // Inboxes
   async createInbox(opts?: { localPart?: string; domain?: string; ttlMinutes?: number }) {
@@ -70,5 +84,30 @@ export const api = {
   // Attachments
   getAttachmentUrl(address: string, emailId: string, attachmentId: string) {
     return `${BASE}/api/v1/inboxes/${encodeURIComponent(address)}/emails/${emailId}/attachments/${attachmentId}`;
+  },
+
+  async ownerLogin(password: string) {
+    return fetchJson<{ token: string }>("/owner/login", {
+      method: "POST",
+      body: JSON.stringify({ password }),
+    });
+  },
+
+  async ownerStats(token: string) {
+    return fetchOwnerJson<{
+      totalInboxes: number;
+      activeInboxes: number;
+      deletedInboxes: number;
+      totalEmails: number;
+      emailsToday: number;
+    }>("/owner/stats", token);
+  },
+
+  async ownerInboxes(token: string) {
+    return fetchOwnerJson<{ inboxes: Array<{ address: string; expiresAt: string | null; createdAt: string; lastEmailAt: string | null; emailCount: number }> }>("/owner/inboxes", token);
+  },
+
+  async ownerApi(token: string) {
+    return fetchOwnerJson<{ token: string; endpoints: Array<{ method: string; path: string; description: string }> }>("/owner/api", token);
   },
 };
