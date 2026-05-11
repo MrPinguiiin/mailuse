@@ -1,12 +1,14 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { api } from "$lib/api";
+  import { PUBLIC_APP_DOMAIN, PUBLIC_EMAIL_DOMAIN } from "$env/static/public";
   import { Mail, Clock, Zap, Shield } from "@lucide/svelte";
 
   let localPart = $state("");
   let ttlMinutes = $state(60);
   let loading = $state(false);
   let error = $state("");
+  const emailDomain = PUBLIC_EMAIL_DOMAIN || PUBLIC_APP_DOMAIN || "localhost";
 
   async function createInbox() {
     loading = true;
@@ -56,7 +58,7 @@
             placeholder="random"
             class="flex-1 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-500"
           />
-          <span class="text-sm text-zinc-500">@{'{domain}'}</span>
+          <span class="text-sm text-zinc-500">@{emailDomain}</span>
         </div>
       </div>
 

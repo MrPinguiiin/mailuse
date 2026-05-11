@@ -9,7 +9,7 @@ const logger = createLogger("smtp");
 const server = new SMTPServer({
   authOptional: true,
   disabledCommands: ["AUTH"],
-  banner: `${env.SMTP_DOMAIN || env.APP_DOMAIN} ESMTP mailuse`,
+  banner: `${env.SMTP_DOMAIN || env.DOMAIN || env.APP_DOMAIN} ESMTP mailuse`,
   size: 10 * 1024 * 1024, // 10MB max
 
   onConnect(session, callback) {
@@ -24,7 +24,7 @@ const server = new SMTPServer({
 
   onRcptTo(address, session, callback) {
     const domain = address.address.split("@")[1];
-    const allowedDomain = env.SMTP_DOMAIN || env.APP_DOMAIN;
+    const allowedDomain = env.SMTP_DOMAIN || env.DOMAIN || env.APP_DOMAIN;
 
     if (domain !== allowedDomain) {
       logger.warn({ to: address.address, domain }, "Rejected: domain not served");

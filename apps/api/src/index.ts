@@ -7,6 +7,7 @@ import { inboxRoutes } from "./routes/inboxes";
 import { emailRoutes } from "./routes/emails";
 import { domainRoutes } from "./routes/domains";
 import { healthRoutes } from "./routes/health";
+import { compatibilityRoutes } from "./routes/compatibility";
 import { startCleanupJob } from "./jobs/cleanup";
 
 const app = new Hono();
@@ -29,6 +30,10 @@ app.route("/api/v1", domainRoutes);
 app.route("/api/v1", inboxRoutes);
 app.route("/api/v1", emailRoutes);
 
+// Legacy-compatible API surface.
+app.route("/api", healthRoutes);
+app.route("/api", compatibilityRoutes);
+
 // Root
 app.get("/", (c) => c.text("mailuse API"));
 
@@ -36,6 +41,6 @@ app.get("/", (c) => c.text("mailuse API"));
 startCleanupJob();
 
 export default {
-  port: env.PORT,
+  port: env.API_PORT || env.PORT,
   fetch: app.fetch,
 };

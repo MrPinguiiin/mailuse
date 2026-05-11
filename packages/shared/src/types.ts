@@ -26,6 +26,7 @@ export interface EmailDetail {
   subject: string;
   textBody: string | null;
   htmlBody: string | null;
+  headers: Record<string, string> | null;
   rawSize: number;
   receivedAt: string;
   hasAttachments: boolean;

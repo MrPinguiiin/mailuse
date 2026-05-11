@@ -28,10 +28,16 @@ export async function handleMessage(stream: Readable, session: SMTPServerSession
   const fromAddress =
     parsed.from?.value[0]?.address || session.envelope.mailFrom?.address || "unknown@unknown";
 
-  const messageId = parsed.messageId || `${generateId("eml")}@${env.APP_DOMAIN}`;
+  const messageId = parsed.messageId || `${generateId("eml")}@${env.DOMAIN || env.APP_DOMAIN}`;
   const subject = parsed.subject || "(no subject)";
   const textBody = parsed.text || null;
   const htmlBody = parsed.html || null;
+  const headers = Object.fromEntries(
+    Array.from(parsed.headers.entries()).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? value.join(", ") : String(value),
+    ])
+  );
 
   logger.info(
     { from: fromAddress, to: toAddresses, subject, size: rawSize },
@@ -42,7 +48,7 @@ export async function handleMessage(stream: Readable, session: SMTPServerSession
     if (!toAddress) continue;
 
     const domain = toAddress.split("@")[1];
-    const allowedDomain = env.SMTP_DOMAIN || env.APP_DOMAIN;
+    const allowedDomain = env.SMTP_DOMAIN || env.DOMAIN || env.APP_DOMAIN;
 
     if (domain !== allowedDomain) {
       logger.warn({ toAddress, domain }, "Skipping: domain not served");
@@ -62,7 +68,7 @@ export async function handleMessage(stream: Readable, session: SMTPServerSession
           address: toAddress,
           localPart,
           domain,
-          expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour default
+          expiresAt: new Date(Date.now() + env.EMAIL_TTL_SECONDS * 1000),
         },
       });
       logger.info({ address: toAddress }, "Auto-created inbox");
@@ -98,10 +104,11 @@ export async function handleMessage(stream: Readable, session: SMTPServerSession
       storageKey: string;
     }> = [];
 
+    const emailId = generateId("eml");
+
     if (parsed.attachments && parsed.attachments.length > 0) {
       for (const att of parsed.attachments) {
         const attId = generateId("att");
-        const emailId = generateId("eml"); // pre-generate for path
         const storageKey = `${inbox.id}/${emailId}/${attId}/${att.filename || "unnamed"}`;
 
         await uploadAttachment(storageKey, att.content, att.contentType);
@@ -117,7 +124,6 @@ export async function handleMessage(stream: Readable, session: SMTPServerSession
     }
 
     // Store email
-    const emailId = generateId("eml");
     await prisma.email.create({
       data: {
         id: emailId,
@@ -128,6 +134,7 @@ export async function handleMessage(stream: Readable, session: SMTPServerSession
         subject,
         textBody,
         htmlBody,
+        headers,
         rawSize,
         hasAttachments: attachmentRecords.length > 0,
         attachments: {

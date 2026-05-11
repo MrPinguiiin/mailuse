@@ -8,6 +8,9 @@ export const env = createEnv({
     DATABASE_URL: z.string().min(1),
 
     // App
+    DOMAIN: z.string().min(1).optional(),
+    APP_NAME: z.string().default("mailuse"),
+    API_PORT: z.coerce.number().optional(),
     APP_DOMAIN: z.string().min(1).default("localhost"),
     PORT: z.coerce.number().default(3000),
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -23,6 +26,9 @@ export const env = createEnv({
     // SMTP
     SMTP_DOMAIN: z.string().optional(),
     SMTP_PORT: z.coerce.number().default(25),
+
+    // TTL in seconds. Applies to auto-created inboxes and default API TTL.
+    EMAIL_TTL_SECONDS: z.coerce.number().int().min(60).default(3600),
 
     // Deploy mode
     DEPLOY_MODE: z.enum(["docker", "cloudflare"]).default("docker"),

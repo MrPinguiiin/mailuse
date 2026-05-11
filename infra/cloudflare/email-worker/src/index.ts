@@ -30,6 +30,7 @@ export default {
     // Extract headers for subject and message-id
     const subject = message.headers.get("subject") || "(no subject)";
     const messageId = message.headers.get("message-id") || `eml_${crypto.randomUUID()}@${env.APP_DOMAIN}`;
+    const headers = JSON.stringify(Object.fromEntries(message.headers.entries()));
 
     // Check if inbox exists
     const localPart = toAddress.split("@")[0];
@@ -70,10 +71,10 @@ export default {
 
     // Store metadata in D1
     await env.DB.prepare(
-      `INSERT INTO emails (id, inbox_id, message_id, from_address, to_address, subject, raw_size, received_at, has_attachments)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)`
+      `INSERT INTO emails (id, inbox_id, message_id, from_address, to_address, subject, headers, raw_size, received_at, has_attachments)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`
     )
-      .bind(emailId, inbox.id, messageId, fromAddress, toAddress, subject, rawSize, new Date().toISOString())
+      .bind(emailId, inbox.id, messageId, fromAddress, toAddress, subject, headers, rawSize, new Date().toISOString())
       .run();
 
     // Update inbox last_email_at

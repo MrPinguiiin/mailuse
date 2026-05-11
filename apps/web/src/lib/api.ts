@@ -1,4 +1,4 @@
-import { PUBLIC_API_BASE } from "$env/static/public";
+import { PUBLIC_API_BASE, PUBLIC_API_URL } from "$env/static/public";
 import type {
   Inbox,
   EmailSummary,
@@ -7,7 +7,7 @@ import type {
   PaginatedResponse,
 } from "@mailuse/shared/types";
 
-const BASE = PUBLIC_API_BASE || "http://localhost:3000";
+const BASE = PUBLIC_API_URL || PUBLIC_API_BASE || "http://localhost:3000";
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}/api/v1${path}`, {

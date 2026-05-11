@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS emails (
   subject TEXT NOT NULL DEFAULT '',
   text_body TEXT,
   html_body TEXT,
+  headers TEXT,
   raw_size INTEGER NOT NULL DEFAULT 0,
   received_at TEXT NOT NULL DEFAULT (datetime('now')),
   expires_at TEXT,

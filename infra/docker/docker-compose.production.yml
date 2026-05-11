@@ -50,7 +50,11 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://mailuse:${POSTGRES_PASSWORD:-mailuse}@postgres:5432/mailuse
+      DOMAIN: ${DOMAIN:-localhost}
+      APP_NAME: ${APP_NAME:-mailuse}
+      EMAIL_TTL_SECONDS: ${EMAIL_TTL_SECONDS:-3600}
       APP_DOMAIN: ${DOMAIN:-localhost}
+      API_PORT: 3000
       PORT: 3000
       NODE_ENV: production
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
@@ -76,7 +80,10 @@ services:
     restart: unless-stopped
     environment:
       PUBLIC_API_BASE: ${PUBLIC_API_BASE:-http://localhost:3000}
+      PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:3000}
       PUBLIC_APP_DOMAIN: ${DOMAIN:-localhost}
+      PUBLIC_EMAIL_DOMAIN: ${DOMAIN:-localhost}
+      PUBLIC_APP_NAME: ${APP_NAME:-mailuse}
     ports:
       - "5173:3000"
     depends_on:
@@ -89,6 +96,9 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://mailuse:${POSTGRES_PASSWORD:-mailuse}@postgres:5432/mailuse
+      DOMAIN: ${DOMAIN:-localhost}
+      APP_NAME: ${APP_NAME:-mailuse}
+      EMAIL_TTL_SECONDS: ${EMAIL_TTL_SECONDS:-3600}
       APP_DOMAIN: ${DOMAIN:-localhost}
       SMTP_DOMAIN: ${DOMAIN:-localhost}
       SMTP_PORT: 25

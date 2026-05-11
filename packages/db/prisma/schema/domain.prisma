@@ -38,6 +38,7 @@ model Email {
   subject        String   @default("")
   textBody       String?  @map("text_body")
   htmlBody       String?  @map("html_body")
+  headers        Json?
   rawSize        Int      @default(0) @map("raw_size")
   receivedAt     DateTime @default(now()) @map("received_at")
   expiresAt      DateTime? @map("expires_at")

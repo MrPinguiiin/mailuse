@@ -6,9 +6,9 @@ import type { CreateInboxInput } from "@mailuse/shared/schemas";
 export class InboxService {
   static async create(input: CreateInboxInput) {
     const localPart = input.localPart || this.generateLocalPart();
-    const domain = input.domain || env.APP_DOMAIN;
+    const domain = input.domain || env.DOMAIN || env.APP_DOMAIN;
     const address = `${localPart}@${domain}`;
-    const ttlMinutes = input.ttlMinutes || 60;
+    const ttlMinutes = input.ttlMinutes || Math.ceil(env.EMAIL_TTL_SECONDS / 60);
 
     const expiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000);
 
@@ -68,6 +68,20 @@ export class InboxService {
     });
 
     return true;
+  }
+
+  static async clear(address: string) {
+    const inbox = await prisma.inbox.findUnique({
+      where: { address, isDeleted: false },
+    });
+
+    if (!inbox) return null;
+
+    const result = await prisma.email.deleteMany({
+      where: { inboxId: inbox.id },
+    });
+
+    return result.count;
   }
 
   static async findByAddress(address: string) {

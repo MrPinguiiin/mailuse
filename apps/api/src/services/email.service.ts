@@ -10,6 +10,7 @@ interface StoreEmailInput {
   subject: string;
   textBody?: string;
   htmlBody?: string;
+  headers?: Record<string, string>;
   rawSize: number;
   attachments?: Array<{
     filename: string;
@@ -40,6 +41,9 @@ export class EmailService {
           messageId: true,
           fromAddress: true,
           subject: true,
+          textBody: true,
+          htmlBody: true,
+          headers: true,
           receivedAt: true,
           rawSize: true,
           hasAttachments: true,
@@ -93,6 +97,7 @@ export class EmailService {
       subject: email.subject,
       textBody: email.textBody,
       htmlBody: email.htmlBody,
+      headers: email.headers,
       rawSize: email.rawSize,
       receivedAt: email.receivedAt.toISOString(),
       hasAttachments: email.hasAttachments,
@@ -155,6 +160,7 @@ export class EmailService {
         subject: input.subject,
         textBody: input.textBody,
         htmlBody: input.htmlBody,
+        headers: input.headers,
         rawSize: input.rawSize,
         hasAttachments: attachmentRecords.length > 0,
         attachments: {
@@ -192,6 +198,68 @@ export class EmailService {
       contentType: attachment.contentType,
       size: attachment.size,
       stream,
+    };
+  }
+
+  static async getByIdOnly(emailId: string) {
+    const email = await prisma.email.findUnique({
+      where: { id: emailId },
+      include: {
+        attachments: {
+          select: {
+            id: true,
+            filename: true,
+            contentType: true,
+            size: true,
+          },
+        },
+      },
+    });
+
+    if (!email) return null;
+
+    return {
+      id: email.id,
+      messageId: email.messageId,
+      fromAddress: email.fromAddress,
+      toAddress: email.toAddress,
+      subject: email.subject,
+      textBody: email.textBody,
+      htmlBody: email.htmlBody,
+      headers: email.headers,
+      rawSize: email.rawSize,
+      receivedAt: email.receivedAt.toISOString(),
+      hasAttachments: email.hasAttachments,
+      attachments: email.attachments,
+    };
+  }
+
+  static async deleteByIdOnly(emailId: string) {
+    const email = await prisma.email.findUnique({
+      where: { id: emailId },
+      include: { attachments: true },
+    });
+
+    if (!email) return false;
+
+    for (const att of email.attachments) {
+      await StorageService.delete(att.storageKey);
+    }
+
+    await prisma.email.delete({ where: { id: emailId } });
+    return true;
+  }
+
+  static toMailuseEmail(email: any) {
+    return {
+      id: email.id,
+      to: email.toAddress,
+      from: email.fromAddress,
+      subject: email.subject,
+      text: email.textBody || "",
+      html: email.htmlBody || "",
+      headers: email.headers || {},
+      receivedAt: email.receivedAt,
     };
   }
 }
