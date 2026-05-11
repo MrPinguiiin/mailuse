@@ -20,7 +20,10 @@
   let error = $state("");
   let copied = $state(false);
   let refreshing = $state(false);
+  let pollingTick = $state(0);
+  let secondsUntilPoll = $state(POLLING_INTERVAL_MS / 1000);
   let pollTimer: ReturnType<typeof setInterval> | null = null;
+  let countdownTimer: ReturnType<typeof setInterval> | null = null;
 
   const latestEmail = $derived(emails[0]);
 
@@ -45,8 +48,10 @@
 
   async function refresh() {
     refreshing = true;
+    secondsUntilPoll = POLLING_INTERVAL_MS / 1000;
     loading = emails.length === 0;
     await Promise.all([loadInbox(), loadEmails()]);
+    pollingTick += 1;
     refreshing = false;
     loading = false;
   }
@@ -68,13 +73,27 @@
   }
 
   function startPolling() {
-    pollTimer = setInterval(loadEmails, POLLING_INTERVAL_MS);
+    pollTimer = setInterval(async () => {
+      refreshing = true;
+      secondsUntilPoll = POLLING_INTERVAL_MS / 1000;
+      await loadEmails();
+      pollingTick += 1;
+      refreshing = false;
+    }, POLLING_INTERVAL_MS);
+
+    countdownTimer = setInterval(() => {
+      secondsUntilPoll = secondsUntilPoll <= 1 ? POLLING_INTERVAL_MS / 1000 : secondsUntilPoll - 1;
+    }, 1000);
   }
 
   function stopPolling() {
     if (pollTimer) {
       clearInterval(pollTimer);
       pollTimer = null;
+    }
+    if (countdownTimer) {
+      clearInterval(countdownTimer);
+      countdownTimer = null;
     }
   }
 
@@ -96,10 +115,13 @@
         <Card.Header class="space-y-4">
           <div class="flex items-center justify-between gap-3">
             <Badge variant="secondary" class="gap-1.5 rounded-full px-3 py-1">
-              <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-              Live inbox
+              <span class="relative flex h-2.5 w-2.5">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70"></span>
+                <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+              </span>
+              Watching for mail
             </Badge>
-            <Badge variant="outline" class="rounded-full">polls every {POLLING_INTERVAL_MS / 1000}s</Badge>
+            <Badge variant="outline" class="rounded-full">next check in {secondsUntilPoll}s</Badge>
           </div>
 
           <div class="space-y-2">
@@ -129,6 +151,22 @@
           {/if}
 
           <Separator />
+
+          <div class="rounded-xl border bg-zinc-50 p-3 dark:bg-zinc-900/60">
+            <div class="mb-2 flex items-center justify-between text-xs text-muted-foreground">
+              <span class="flex items-center gap-1.5">
+                <RefreshCw class={cn("size-3.5", refreshing && "animate-spin text-emerald-500")} />
+                {refreshing ? "Checking mailbox..." : "Auto-refresh active"}
+              </span>
+              <span>#{pollingTick}</span>
+            </div>
+            <div class="h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+              <div
+                class="h-full rounded-full bg-emerald-500 transition-all duration-1000 ease-linear"
+                style={`width: ${Math.max(4, ((POLLING_INTERVAL_MS / 1000 - secondsUntilPoll) / (POLLING_INTERVAL_MS / 1000)) * 100)}%`}
+              ></div>
+            </div>
+          </div>
 
           <div class="flex flex-wrap gap-2">
             <Button variant="secondary" onclick={copyAddress} class="flex-1">
