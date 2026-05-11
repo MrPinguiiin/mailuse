@@ -23,8 +23,13 @@ export class InboxService {
       },
     });
 
-    const inbox = await prisma.inbox.create({
-      data: {
+    const inbox = await prisma.inbox.upsert({
+      where: { address },
+      update: {
+        expiresAt,
+        isDeleted: false,
+      },
+      create: {
         id: generateId("inb"),
         address,
         localPart,
