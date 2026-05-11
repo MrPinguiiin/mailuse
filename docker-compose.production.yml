@@ -62,9 +62,36 @@ services:
       exit 0;
       "
 
+  migrate:
+    build:
+      context: https://github.com/MrPinguiiin/mailuse.git#main
+      dockerfile: apps/api/Dockerfile
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://mailuse:${POSTGRES_PASSWORD:-mailuse}@postgres:5432/mailuse
+      DOMAIN: ${DOMAIN:-localhost}
+      APP_NAME: ${APP_NAME:-mailuse}
+      EMAIL_TTL_SECONDS: ${EMAIL_TTL_SECONDS:-3600}
+      APP_DOMAIN: ${DOMAIN:-localhost}
+      API_PORT: 3000
+      PORT: 3000
+      NODE_ENV: production
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://inbox.${DOMAIN:-localhost}}
+      STORAGE_ENDPOINT: http://minio:9000
+      STORAGE_BUCKET: emails
+      STORAGE_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
+      STORAGE_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-miniosecret}
+      STORAGE_REGION: auto
+      DEPLOY_MODE: docker
+      AUTO_CREATE_INBOX: "true"
+    command: ["sh", "-c", "cd /app/packages/db && bun run db:deploy"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   api:
     build:
-      context: ../../
+      context: https://github.com/MrPinguiiin/mailuse.git#main
       dockerfile: apps/api/Dockerfile
     restart: unless-stopped
     environment:
@@ -99,36 +126,9 @@ services:
       minio-init:
         condition: service_completed_successfully
 
-  migrate:
-    build:
-      context: ../../
-      dockerfile: apps/api/Dockerfile
-    restart: "no"
-    environment:
-      DATABASE_URL: postgresql://mailuse:${POSTGRES_PASSWORD:-mailuse}@postgres:5432/mailuse
-      DOMAIN: ${DOMAIN:-localhost}
-      APP_NAME: ${APP_NAME:-mailuse}
-      EMAIL_TTL_SECONDS: ${EMAIL_TTL_SECONDS:-3600}
-      APP_DOMAIN: ${DOMAIN:-localhost}
-      API_PORT: 3000
-      PORT: 3000
-      NODE_ENV: production
-      CORS_ORIGIN: ${CORS_ORIGIN:-https://inbox.${DOMAIN:-localhost}}
-      STORAGE_ENDPOINT: http://minio:9000
-      STORAGE_BUCKET: emails
-      STORAGE_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
-      STORAGE_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-miniosecret}
-      STORAGE_REGION: auto
-      DEPLOY_MODE: docker
-      AUTO_CREATE_INBOX: "true"
-    command: ["sh", "-c", "cd /app/packages/db && bun run db:deploy"]
-    depends_on:
-      postgres:
-        condition: service_healthy
-
   web:
     build:
-      context: ../../
+      context: https://github.com/MrPinguiiin/mailuse.git#main
       dockerfile: apps/web/Dockerfile
     restart: unless-stopped
     environment:
@@ -149,7 +149,7 @@ services:
 
   smtp:
     build:
-      context: ../../
+      context: https://github.com/MrPinguiiin/mailuse.git#main
       dockerfile: apps/smtp/Dockerfile
     restart: unless-stopped
     environment:

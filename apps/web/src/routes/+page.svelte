@@ -169,10 +169,8 @@
         <div class="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-zinc-400">
           <Container class="h-4 w-4" /> Docker quick start
         </div>
-        <pre class="overflow-x-auto text-sm leading-7"><code>git clone https://github.com/MrPinguiiin/mailuse.git
-cd mailuse/infra/docker
-cp .env.example .env
-docker compose -f docker-compose.production.yml up -d</code></pre>
+        <pre class="overflow-x-auto text-sm leading-7"><code>curl -fsSL https://raw.githubusercontent.com/MrPinguiiin/mailuse/main/docker-compose.production.yml -o docker-compose.yml
+DOMAIN=yourdomain.com docker compose up -d</code></pre>
       </div>
     </div>
   </section>

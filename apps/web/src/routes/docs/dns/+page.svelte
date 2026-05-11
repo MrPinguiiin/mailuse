@@ -15,11 +15,12 @@
       <pre class="overflow-x-auto rounded-lg bg-zinc-950 p-4 text-sm text-zinc-100"><code>A     @       VERCEL_TARGET       # public landing/docs if hosted on Vercel
 A     docs    VERCEL_TARGET       # optional docs subdomain
 A     api     YOUR_SERVER_IP      # API reverse proxy on VPS
+A     inbox   YOUR_SERVER_IP      # self-hosted inbox web UI on VPS
 A     mail    YOUR_SERVER_IP      # SMTP host on VPS, DNS only
 MX    @       mail.yourdomain.com priority 10
 TXT   @       v=spf1 a mx ~all</code></pre>
       <p class="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-        If you use Cloudflare, keep <code class="rounded bg-zinc-100 px-1 py-0.5 dark:bg-zinc-800">mail</code> as DNS-only. Cloudflare proxy does not proxy SMTP port 25.
+        If you use Cloudflare, keep <code class="rounded bg-zinc-100 px-1 py-0.5 dark:bg-zinc-800">mail</code> as DNS-only. Cloudflare proxy does not proxy SMTP port 25. For first install, keep <code class="rounded bg-zinc-100 px-1 py-0.5 dark:bg-zinc-800">api</code> and <code class="rounded bg-zinc-100 px-1 py-0.5 dark:bg-zinc-800">inbox</code> DNS-only until Traefik has issued certificates.
       </p>
     </section>
 
@@ -30,6 +31,7 @@ TXT   @       v=spf1 a mx ~all</code></pre>
       </p>
       <pre class="overflow-x-auto rounded-lg bg-zinc-950 p-4 text-sm text-zinc-100"><code>dig MX yourdomain.com +short
 dig A mail.yourdomain.com +short
+dig A inbox.yourdomain.com +short
 dig A api.yourdomain.com +short</code></pre>
     </section>
 
@@ -38,10 +40,8 @@ dig A api.yourdomain.com +short</code></pre>
       <p class="mb-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
         Clone the repo, configure <code class="rounded bg-zinc-100 px-1 py-0.5 dark:bg-zinc-800">.env</code>, and start the Docker stack before testing port 25.
       </p>
-      <pre class="overflow-x-auto rounded-lg bg-zinc-950 p-4 text-sm text-zinc-100"><code>git clone https://github.com/MrPinguiiin/mailuse.git
-cd mailuse/infra/docker
-cp .env.example .env
-docker compose -f docker-compose.production.yml up -d --build</code></pre>
+      <pre class="overflow-x-auto rounded-lg bg-zinc-950 p-4 text-sm text-zinc-100"><code>curl -fsSL https://raw.githubusercontent.com/MrPinguiiin/mailuse/main/docker-compose.production.yml -o docker-compose.yml
+DOMAIN=yourdomain.com docker compose up -d</code></pre>
     </section>
 
     <section class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
