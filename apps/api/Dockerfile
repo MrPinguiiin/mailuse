@@ -9,7 +9,7 @@ COPY packages/db/package.json ./packages/db/
 COPY packages/env/package.json ./packages/env/
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/config/package.json ./packages/config/
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Build
 FROM base AS build

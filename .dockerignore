@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+.git
+.turbo
+.svelte-kit
+apps/web/.svelte-kit
+apps/web/build
+apps/api/dist
+apps/smtp/dist
+packages/db/prisma/generated
+*.log
+.env
+.env.local
+infra/docker/.env
