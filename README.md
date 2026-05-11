@@ -73,6 +73,43 @@ bun run db:push
 bun run dev
 ```
 
+## Deploy Web + Docs to Vercel
+
+The `apps/web` app contains both the public app and documentation pages:
+
+- Main app: `/`
+- Docs: `/docs`
+
+Recommended Vercel project settings:
+
+```txt
+Root Directory: apps/web
+Framework Preset: SvelteKit
+Install Command: bun install
+Build Command: bun run build
+Output Directory: default
+```
+
+Environment variables for Vercel:
+
+```env
+PUBLIC_API_URL=https://api.yourdomain.com
+PUBLIC_API_BASE=https://api.yourdomain.com
+PUBLIC_APP_DOMAIN=yourdomain.com
+PUBLIC_EMAIL_DOMAIN=yourdomain.com
+PUBLIC_APP_NAME=mailuse
+```
+
+Domain pattern:
+
+```txt
+yourdomain.com       → Vercel project (app landing)
+docs.yourdomain.com  → same Vercel project, rewritten to /docs
+api.yourdomain.com   → VPS reverse proxy to apps/api
+```
+
+If you use a docs subdomain, update `apps/web/vercel.json` and replace `docs.mailuse.dev` with your real docs host.
+
 ## API Endpoints
 
 ```

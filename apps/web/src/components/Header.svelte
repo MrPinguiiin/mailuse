@@ -22,6 +22,12 @@
       >
         New Inbox
       </a>
+      <a
+        href="/docs"
+        class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+      >
+        Docs
+      </a>
     </nav>
   </div>
 </header>
