@@ -24,7 +24,6 @@
   let copied = $state(false);
   let deleting = $state(false);
   let refreshing = $state(false);
-  let pollingTick = $state(0);
   let secondsUntilPoll = $state(POLLING_INTERVAL_MS / 1000);
   let pollTimer: ReturnType<typeof setInterval> | null = null;
   let countdownTimer: ReturnType<typeof setInterval> | null = null;
@@ -56,7 +55,6 @@
     secondsUntilPoll = POLLING_INTERVAL_MS / 1000;
     loading = emails.length === 0;
     await Promise.all([loadInbox(), loadEmails()]);
-    pollingTick += 1;
     refreshing = false;
     loading = false;
   }
@@ -84,7 +82,6 @@
       refreshing = true;
       secondsUntilPoll = POLLING_INTERVAL_MS / 1000;
       await loadEmails();
-      pollingTick += 1;
       refreshing = false;
     }, POLLING_INTERVAL_MS);
 
@@ -164,9 +161,9 @@
             <div class="mb-2 flex items-center justify-between text-xs text-muted-foreground">
               <span class="flex items-center gap-1.5">
                 <RefreshCw class={cn("size-3.5", refreshing && "animate-spin text-emerald-500")} />
-                {refreshing ? "Checking mailbox..." : "Auto-refresh active"}
+                {refreshing ? "Checking for new mail..." : "Auto-refresh is on"}
               </span>
-              <span>#{pollingTick}</span>
+              <span>{refreshing ? "now" : `${secondsUntilPoll}s`}</span>
             </div>
             <div class="h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
               <div
