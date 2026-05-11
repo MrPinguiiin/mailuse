@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -68,10 +66,39 @@ services:
     ports:
       - "3000:3000"
     depends_on:
+      migrate:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       minio-init:
         condition: service_completed_successfully
+
+  migrate:
+    build:
+      context: ../../
+      dockerfile: apps/api/Dockerfile
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://mailuse:${POSTGRES_PASSWORD:-mailuse}@postgres:5432/mailuse
+      DOMAIN: ${DOMAIN:-localhost}
+      APP_NAME: ${APP_NAME:-mailuse}
+      EMAIL_TTL_SECONDS: ${EMAIL_TTL_SECONDS:-3600}
+      APP_DOMAIN: ${DOMAIN:-localhost}
+      API_PORT: 3000
+      PORT: 3000
+      NODE_ENV: production
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      STORAGE_ENDPOINT: http://minio:9000
+      STORAGE_BUCKET: emails
+      STORAGE_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
+      STORAGE_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-miniosecret}
+      STORAGE_REGION: auto
+      DEPLOY_MODE: docker
+      AUTO_CREATE_INBOX: "true"
+    command: ["bunx", "prisma", "db", "push", "--schema", "./packages/db/prisma/schema", "--accept-data-loss"]
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   web:
     build:
@@ -113,6 +140,8 @@ services:
     ports:
       - "25:25"
     depends_on:
+      migrate:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       minio-init:

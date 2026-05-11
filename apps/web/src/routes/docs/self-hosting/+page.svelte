@@ -7,6 +7,7 @@
   <h1 class="mb-3 text-3xl font-bold text-zinc-950 dark:text-zinc-50">Self-hosting on a VPS</h1>
   <p class="mb-8 text-zinc-600 dark:text-zinc-400">
     mailuse runs as three app services plus storage: web, api, smtp, Postgres, and MinIO.
+    The production compose file also runs a one-shot migration service to prepare the database schema.
   </p>
 
   <section class="space-y-6">

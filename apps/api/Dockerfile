@@ -26,6 +26,8 @@ FROM base AS production
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/apps/api/dist ./dist
 COPY --from=build /app/packages/db/prisma/generated ./packages/db/prisma/generated
+COPY --from=build /app/packages/db/prisma/schema ./packages/db/prisma/schema
+COPY --from=build /app/packages/db/prisma.config.ts ./packages/db/prisma.config.ts
 COPY --from=build /app/packages/env ./packages/env
 COPY --from=build /app/packages/shared ./packages/shared
 
