@@ -1,7 +1,7 @@
 FROM oven/bun:1.3-alpine AS base
 WORKDIR /app
 
-RUN apk add --no-cache docker-cli postgresql16-client curl bash
+RUN apk add --no-cache docker-cli docker-cli-compose postgresql16-client curl bash
 
 COPY package.json bun.lock ./
 COPY packages ./packages
