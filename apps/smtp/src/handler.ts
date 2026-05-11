@@ -62,6 +62,17 @@ export async function handleMessage(stream: Readable, session: SMTPServerSession
 
     if (!inbox && env.AUTO_CREATE_INBOX) {
       const localPart = toAddress.split("@")[0]!;
+      await prisma.domain.upsert({
+        where: { domain },
+        update: { isActive: true },
+        create: {
+          id: generateId("dom"),
+          domain,
+          providerType: "smtp",
+          isActive: true,
+        },
+      });
+
       inbox = await prisma.inbox.create({
         data: {
           id: generateId("inb"),

@@ -12,6 +12,17 @@ export class InboxService {
 
     const expiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000);
 
+    await prisma.domain.upsert({
+      where: { domain },
+      update: { isActive: true },
+      create: {
+        id: generateId("dom"),
+        domain,
+        providerType: "smtp",
+        isActive: true,
+      },
+    });
+
     const inbox = await prisma.inbox.create({
       data: {
         id: generateId("inb"),
