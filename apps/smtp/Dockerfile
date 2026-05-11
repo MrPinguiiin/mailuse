@@ -17,7 +17,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
 COPY . .
 WORKDIR /app/packages/db
-RUN bun run db:generate
+RUN DATABASE_URL=postgresql://mailuse:mailuse@localhost:5432/mailuse bun run db:generate
 WORKDIR /app/apps/smtp
 RUN bun run build
 
