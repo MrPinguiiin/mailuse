@@ -67,6 +67,7 @@ dig A dashboard.yourdomain.com +short
 dig MX yourdomain.com +short</code></pre>
       <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-zinc-600 dark:text-zinc-400">
         <li>If HTTPS fails, check ports <code>80</code>/<code>443</code> and Traefik logs.</li>
+        <li>If Let's Encrypt reports a rate limit, keep the Docker certificate volume and wait for the retry window. Do not run <code>docker compose down -v</code> to fix certificate issues.</li>
         <li>If SMTP fails, check port <code>25</code>, MX record, and SMTP logs.</li>
         <li>If dashboard login fails repeatedly, wait for the rate-limit window or restart API.</li>
       </ul>
@@ -82,6 +83,7 @@ dig MX yourdomain.com +short</code></pre>
         <li>Only one update can run at a time.</li>
         <li>Update attempts are audited in <code>dashboard.yourdomain.com/dashboard/history</code>.</li>
         <li>Database backups are kept for <code>3</code> days by default.</li>
+        <li>Normal updates should not delete Docker volumes. Keep the Traefik Let's Encrypt volume so existing certificates are reused.</li>
       </ul>
     </div>
   </section>
