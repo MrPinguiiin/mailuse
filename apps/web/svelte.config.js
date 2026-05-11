@@ -1,9 +1,9 @@
 import nodeAdapter from "@sveltejs/adapter-node";
-import vercelAdapter from "@sveltejs/adapter-vercel";
+import staticAdapter from "@sveltejs/adapter-static";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
 const adapter = process.env.VERCEL
-  ? vercelAdapter({ runtime: "nodejs22.x" })
+  ? staticAdapter({ pages: "public", assets: "public", fallback: "200.html" })
   : nodeAdapter();
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -12,6 +12,9 @@ const config = {
 
   kit: {
     adapter,
+    prerender: {
+      entries: ["*"],
+    },
   },
 };
 

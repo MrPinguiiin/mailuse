@@ -5,6 +5,7 @@ node_modules/
 dist/
 build/
 .svelte-kit/
+apps/web/public/
 
 # Prisma generated
 packages/db/prisma/generated/
