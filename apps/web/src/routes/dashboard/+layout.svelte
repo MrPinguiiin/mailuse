@@ -42,10 +42,15 @@
           {#each links as link}
             {@const Icon = link.icon}
             <Sidebar.MenuItem>
-              <Sidebar.MenuButton href={link.href} isActive={page.url.pathname === link.href} tooltip={link.label}>
+              <a
+                href={link.href}
+                data-active={page.url.pathname === link.href}
+                class="flex h-8 w-full items-center gap-2 rounded-md px-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+                title={link.label}
+              >
                 <Icon class="size-4" />
                 <span>{link.label}</span>
-              </Sidebar.MenuButton>
+              </a>
             </Sidebar.MenuItem>
           {/each}
         </Sidebar.Menu>
@@ -54,7 +59,7 @@
     <Sidebar.Footer>
       <Sidebar.Menu>
         <Sidebar.MenuItem>
-          <Sidebar.MenuButton onclick={logout} tooltip="Logout">
+          <Sidebar.MenuButton onclick={logout} tooltipContent="Logout">
             <LogOut class="size-4" />
             <span>Logout</span>
           </Sidebar.MenuButton>
