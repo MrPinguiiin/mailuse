@@ -2,44 +2,45 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+	return twMerge(clsx(inputs));
 }
 
-export function timeAgo(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type WithoutChild<T> = T extends { child?: any } ? Omit<T, "child"> : T;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type WithoutChildren<T> = T extends { children?: any } ? Omit<T, "children"> : T;
+export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
+export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
 
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  if (seconds < 60) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  return `${days}d ago`;
+export function formatBytes(bytes: number) {
+	if (bytes === 0) return "0 B";
+	const units = ["B", "KB", "MB", "GB"];
+	const index = Math.floor(Math.log(bytes) / Math.log(1024));
+	return `${Number.parseFloat((bytes / 1024 ** index).toFixed(1))} ${units[index]}`;
 }
 
-export function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0 B";
-  const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+export function timeAgo(date: string | Date) {
+	const timestamp = new Date(date).getTime();
+	const seconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
+
+	if (seconds < 60) return "just now";
+	const minutes = Math.floor(seconds / 60);
+	if (minutes < 60) return `${minutes}m ago`;
+	const hours = Math.floor(minutes / 60);
+	if (hours < 24) return `${hours}h ago`;
+	const days = Math.floor(hours / 24);
+	return `${days}d ago`;
 }
 
-export function timeRemaining(expiresAt: string | null): string {
-  if (!expiresAt) return "No expiry";
-  const expires = new Date(expiresAt);
-  const now = new Date();
-  const diff = expires.getTime() - now.getTime();
+export function timeRemaining(date: string | Date) {
+	const timestamp = new Date(date).getTime();
+	const seconds = Math.max(0, Math.floor((timestamp - Date.now()) / 1000));
 
-  if (diff <= 0) return "Expired";
-
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(minutes / 60);
-
-  if (hours > 0) return `${hours}h ${minutes % 60}m remaining`;
-  return `${minutes}m remaining`;
+	if (seconds === 0) return "expired";
+	const minutes = Math.floor(seconds / 60);
+	if (minutes < 60) return `${minutes}m remaining`;
+	const hours = Math.floor(minutes / 60);
+	if (hours < 24) return `${hours}h remaining`;
+	const days = Math.floor(hours / 24);
+	return `${days}d remaining`;
 }

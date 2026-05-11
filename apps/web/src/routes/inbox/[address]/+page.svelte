@@ -1,20 +1,28 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import { Badge } from "$lib/components/ui/badge";
+  import { Button } from "$lib/components/ui/button";
+  import * as Card from "$lib/components/ui/card";
+  import { Separator } from "$lib/components/ui/separator";
+  import { Skeleton } from "$lib/components/ui/skeleton";
   import { api } from "$lib/api";
+  import { cn } from "$lib/utils";
   import { timeAgo, formatBytes, timeRemaining } from "$lib/utils";
-  import { Mail, Trash2, RefreshCw, Clock, Copy, Check } from "@lucide/svelte";
+  import { Check, Clock, Copy, Inbox, Mail, RefreshCw, ShieldCheck, Trash2, Zap } from "@lucide/svelte";
   import { POLLING_INTERVAL_MS } from "@mailuse/shared/constants";
-  import type { Inbox, EmailSummary } from "@mailuse/shared/types";
+  import type { Inbox as InboxType, EmailSummary } from "@mailuse/shared/types";
 
   const address = $derived(decodeURIComponent(page.params.address));
 
-  let inbox = $state<Inbox | null>(null);
+  let inbox = $state<InboxType | null>(null);
   let emails = $state<EmailSummary[]>([]);
   let loading = $state(true);
   let error = $state("");
   let copied = $state(false);
-  let polling = $state(true);
+  let refreshing = $state(false);
   let pollTimer: ReturnType<typeof setInterval> | null = null;
+
+  const latestEmail = $derived(emails[0]);
 
   async function loadInbox() {
     try {
@@ -28,16 +36,18 @@
     try {
       const result = await api.listEmails(address);
       emails = result.emails;
-    } catch (e: any) {
-      // Inbox might not exist yet
+    } catch {
+      // Inbox might not exist yet.
     } finally {
       loading = false;
     }
   }
 
   async function refresh() {
-    loading = true;
+    refreshing = true;
+    loading = emails.length === 0;
     await Promise.all([loadInbox(), loadEmails()]);
+    refreshing = false;
     loading = false;
   }
 
@@ -45,7 +55,7 @@
     if (!confirm("Delete this inbox and all emails?")) return;
     try {
       await api.deleteInbox(address);
-      window.location.href = "/";
+      window.location.href = "/new";
     } catch (e: any) {
       error = e.message;
     }
@@ -79,101 +89,161 @@
   <title>{address} - mailuse</title>
 </svelte:head>
 
-<div class="container mx-auto max-w-3xl px-4 py-6">
-  <!-- Inbox Header -->
-  <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 mb-4">
-    <div class="flex items-center justify-between mb-3">
-      <div class="flex items-center gap-2">
-        <Mail class="h-5 w-5 text-zinc-500" />
-        <h1 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 break-all">
-          {address}
-        </h1>
-      </div>
-      <div class="flex items-center gap-2">
-        <button
-          onclick={copyAddress}
-          class="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-          title="Copy address"
-        >
-          {#if copied}
-            <Check class="h-4 w-4 text-green-500" />
-          {:else}
-            <Copy class="h-4 w-4 text-zinc-500" />
-          {/if}
-        </button>
-        <button
-          onclick={refresh}
-          class="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-          title="Refresh"
-        >
-          <RefreshCw class="h-4 w-4 text-zinc-500 {loading ? 'animate-spin' : ''}" />
-        </button>
-        <button
-          onclick={deleteInbox}
-          class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
-          title="Delete inbox"
-        >
-          <Trash2 class="h-4 w-4 text-red-500" />
-        </button>
-      </div>
-    </div>
+<div class="min-h-[calc(100vh-4rem)] bg-[radial-gradient(circle_at_top_left,rgba(24,24,27,0.08),transparent_32rem)] px-4 py-6 dark:bg-[radial-gradient(circle_at_top_left,rgba(244,244,245,0.08),transparent_32rem)] sm:py-10">
+  <div class="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+    <aside class="space-y-4">
+      <Card.Root class="overflow-hidden border-zinc-200/80 bg-white/85 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/80">
+        <Card.Header class="space-y-4">
+          <div class="flex items-center justify-between gap-3">
+            <Badge variant="secondary" class="gap-1.5 rounded-full px-3 py-1">
+              <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+              Live inbox
+            </Badge>
+            <Badge variant="outline" class="rounded-full">polls every {POLLING_INTERVAL_MS / 1000}s</Badge>
+          </div>
 
-    {#if inbox?.expiresAt}
-      <div class="flex items-center gap-1.5 text-xs text-zinc-500">
-        <Clock class="h-3.5 w-3.5" />
-        <span>{timeRemaining(inbox.expiresAt)}</span>
-      </div>
-    {/if}
-  </div>
+          <div class="space-y-2">
+            <Card.Title class="break-all font-mono text-xl leading-tight">{address}</Card.Title>
+            <Card.Description>Receive disposable email on your own domain with no signup flow.</Card.Description>
+          </div>
+        </Card.Header>
 
-  <!-- Email List -->
-  {#if error}
-    <div class="text-center py-12">
-      <p class="text-red-600 dark:text-red-400">{error}</p>
-    </div>
-  {:else if loading && emails.length === 0}
-    <div class="text-center py-12">
-      <RefreshCw class="h-6 w-6 text-zinc-400 animate-spin mx-auto mb-3" />
-      <p class="text-sm text-zinc-500">Loading emails...</p>
-    </div>
-  {:else if emails.length === 0}
-    <div class="text-center py-12">
-      <Mail class="h-10 w-10 text-zinc-300 dark:text-zinc-700 mx-auto mb-3" />
-      <p class="text-sm text-zinc-500 mb-1">No emails yet</p>
-      <p class="text-xs text-zinc-400">
-        Send an email to <span class="font-mono">{address}</span> and it will appear here
-      </p>
-    </div>
-  {:else}
-    <div class="space-y-2">
-      {#each emails as email}
-        <a
-          href="/inbox/{encodeURIComponent(address)}/{email.id}"
-          class="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
-        >
-          <div class="flex items-start justify-between gap-3">
-            <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                {email.subject || "(no subject)"}
-              </p>
-              <p class="text-xs text-zinc-500 truncate mt-0.5">
-                {email.fromAddress}
-              </p>
+        <Card.Content class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-xl border bg-zinc-50 p-3 dark:bg-zinc-900/60">
+              <p class="text-xs text-muted-foreground">Messages</p>
+              <p class="mt-1 text-2xl font-semibold">{emails.length}</p>
             </div>
-            <div class="text-right shrink-0">
-              <p class="text-xs text-zinc-400">{timeAgo(email.receivedAt)}</p>
-              <p class="text-xs text-zinc-400 mt-0.5">{formatBytes(email.rawSize)}</p>
+            <div class="rounded-xl border bg-zinc-50 p-3 dark:bg-zinc-900/60">
+              <p class="text-xs text-muted-foreground">Expires</p>
+              <p class="mt-1 truncate text-sm font-medium">{inbox?.expiresAt ? timeRemaining(inbox.expiresAt) : "Active"}</p>
             </div>
           </div>
-          {#if email.hasAttachments}
-            <div class="mt-2">
-              <span class="inline-flex items-center text-xs text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded">
-                Attachments
-              </span>
+
+          {#if latestEmail}
+            <div class="rounded-xl border bg-zinc-50 p-3 dark:bg-zinc-900/60">
+              <p class="text-xs text-muted-foreground">Latest sender</p>
+              <p class="mt-1 truncate text-sm font-medium">{latestEmail.fromAddress}</p>
+              <p class="mt-1 text-xs text-muted-foreground">{timeAgo(latestEmail.receivedAt)}</p>
             </div>
           {/if}
-        </a>
-      {/each}
-    </div>
-  {/if}
+
+          <Separator />
+
+          <div class="flex flex-wrap gap-2">
+            <Button variant="secondary" onclick={copyAddress} class="flex-1">
+              {#if copied}
+                <Check class="size-4" />
+                Copied
+              {:else}
+                <Copy class="size-4" />
+                Copy address
+              {/if}
+            </Button>
+            <Button variant="outline" size="icon" onclick={refresh} title="Refresh inbox">
+              <RefreshCw class={cn("size-4", refreshing && "animate-spin")} />
+            </Button>
+            <Button variant="destructive" size="icon" onclick={deleteInbox} title="Delete inbox">
+              <Trash2 class="size-4" />
+            </Button>
+          </div>
+        </Card.Content>
+      </Card.Root>
+
+      <Card.Root class="border-dashed bg-transparent shadow-none">
+        <Card.Content class="grid gap-3 p-4 text-sm text-muted-foreground">
+          <div class="flex items-center gap-2">
+            <Zap class="size-4 text-amber-500" />
+            New mail appears automatically.
+          </div>
+          <div class="flex items-center gap-2">
+            <ShieldCheck class="size-4 text-emerald-500" />
+            Data stays on your VPS.
+          </div>
+          <div class="flex items-center gap-2">
+            <Clock class="size-4 text-sky-500" />
+            TTL cleanup follows server config.
+          </div>
+        </Card.Content>
+      </Card.Root>
+    </aside>
+
+    <main class="space-y-4">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-sm font-medium text-muted-foreground">Inbox</p>
+          <h1 class="text-3xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">Messages</h1>
+        </div>
+        <Button href="/new" variant="outline">Create another inbox</Button>
+      </div>
+
+      {#if error}
+        <Card.Root class="border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+          <Card.Content class="p-5">{error}</Card.Content>
+        </Card.Root>
+      {:else if loading && emails.length === 0}
+        <div class="space-y-3">
+          {#each Array(4) as _}
+            <Card.Root>
+              <Card.Content class="flex items-center gap-4 p-4">
+                <Skeleton class="size-10 rounded-full" />
+                <div class="flex-1 space-y-2">
+                  <Skeleton class="h-4 w-2/3" />
+                  <Skeleton class="h-3 w-1/3" />
+                </div>
+                <Skeleton class="h-4 w-16" />
+              </Card.Content>
+            </Card.Root>
+          {/each}
+        </div>
+      {:else if emails.length === 0}
+        <Card.Root class="border-dashed bg-white/60 dark:bg-zinc-950/50">
+          <Card.Content class="flex min-h-80 flex-col items-center justify-center p-8 text-center">
+            <div class="mb-4 rounded-2xl border bg-zinc-50 p-4 dark:bg-zinc-900">
+              <Inbox class="size-9 text-muted-foreground" />
+            </div>
+            <h2 class="text-lg font-semibold">No emails yet</h2>
+            <p class="mt-1 max-w-md text-sm text-muted-foreground">
+              Send an email to <span class="font-mono font-medium text-foreground">{address}</span> and it will appear here automatically.
+            </p>
+          </Card.Content>
+        </Card.Root>
+      {:else}
+        <div class="space-y-3">
+          {#each emails as email}
+            <Card.Root class="group transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md dark:hover:border-zinc-700">
+              <a href="/inbox/{encodeURIComponent(address)}/{email.id}" class="block">
+                <Card.Content class="p-4 sm:p-5">
+                  <div class="flex gap-4">
+                    <div class="mt-1 hidden rounded-2xl border bg-zinc-50 p-3 transition group-hover:bg-zinc-100 dark:bg-zinc-900 dark:group-hover:bg-zinc-800 sm:block">
+                      <Mail class="size-5 text-muted-foreground" />
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                        <div class="min-w-0">
+                          <h2 class="truncate text-base font-semibold text-zinc-950 dark:text-zinc-50">{email.subject || "(no subject)"}</h2>
+                          <p class="mt-1 truncate text-sm text-muted-foreground">{email.fromAddress}</p>
+                        </div>
+                        <div class="flex shrink-0 items-center gap-2 text-xs text-muted-foreground sm:text-right">
+                          <span>{timeAgo(email.receivedAt)}</span>
+                          <span class="hidden sm:inline">/</span>
+                          <span>{formatBytes(email.rawSize)}</span>
+                        </div>
+                      </div>
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        <Badge variant="outline">Received</Badge>
+                        {#if email.hasAttachments}
+                          <Badge variant="secondary">Attachments</Badge>
+                        {/if}
+                      </div>
+                    </div>
+                  </div>
+                </Card.Content>
+              </a>
+            </Card.Root>
+          {/each}
+        </div>
+      {/if}
+    </main>
+  </div>
 </div>
