@@ -161,11 +161,6 @@ ownerRoutes.post("/owner/update/trigger", async (c) => {
   if (!latest.ok) return c.json({ error: "Failed to fetch latest release" }, 502);
   const release = await latest.json();
 
-  const recent = await prisma.updateJob.findFirst({
-    where: { startedAt: { gte: new Date(Date.now() - env.UPDATE_RATE_LIMIT_MINUTES * 60 * 1000) } },
-  });
-  if (recent) return c.json({ error: `Rate limited: wait ${env.UPDATE_RATE_LIMIT_MINUTES} minutes between updates` }, 429);
-
   const running = await prisma.updateJob.findFirst({ where: { status: { in: ["pending", "running"] } } });
   if (running) return c.json({ error: "Update already in progress", jobId: running.id }, 409);
 
