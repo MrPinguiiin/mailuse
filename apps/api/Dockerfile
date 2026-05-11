@@ -16,6 +16,8 @@ FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
+COPY --from=deps /app/packages/env/node_modules ./packages/env/node_modules
+COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
 COPY . .
 WORKDIR /app/packages/db
 RUN DATABASE_URL=postgresql://mailuse:mailuse@localhost:5432/mailuse bun run db:generate
