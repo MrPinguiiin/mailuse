@@ -1,8 +1,10 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
+  import * as AlertDialog from "$lib/components/ui/alert-dialog";
+  import { buttonVariants } from "$lib/components/ui/button";
   import { api } from "$lib/api";
-  import { timeAgo, formatBytes } from "$lib/utils";
+  import { cn, timeAgo, formatBytes } from "$lib/utils";
   import { ArrowLeft, Trash2, Paperclip, Download, FileText, Code, List } from "@lucide/svelte";
   import type { EmailDetail } from "@mailuse/shared/types";
 
@@ -11,6 +13,7 @@
 
   let email = $state<EmailDetail | null>(null);
   let loading = $state(true);
+  let deleting = $state(false);
   let error = $state("");
   let activeTab = $state<"text" | "html" | "headers">("text");
 
@@ -29,12 +32,13 @@
   }
 
   async function deleteEmail() {
-    if (!confirm("Delete this email?")) return;
+    deleting = true;
     try {
       await api.deleteEmail(address, emailId);
       goto(`/inbox/${encodeURIComponent(address)}`);
     } catch (e: any) {
       error = e.message;
+      deleting = false;
     }
   }
 
@@ -57,13 +61,28 @@
       <ArrowLeft class="h-4 w-4" />
       Back to inbox
     </a>
-    <button
-      onclick={deleteEmail}
-      class="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-700 transition-colors"
-    >
-      <Trash2 class="h-4 w-4" />
-      Delete
-    </button>
+    <AlertDialog.Root>
+      <AlertDialog.Trigger
+        class={cn(buttonVariants({ variant: "destructive", size: "sm" }), "gap-1.5")}
+      >
+        <Trash2 class="h-4 w-4" />
+        Delete
+      </AlertDialog.Trigger>
+      <AlertDialog.Content>
+        <AlertDialog.Header>
+          <AlertDialog.Title>Delete this email?</AlertDialog.Title>
+          <AlertDialog.Description>
+            This action cannot be undone. The email{email?.subject ? ` "${email.subject}"` : ""} will be permanently removed from this inbox.
+          </AlertDialog.Description>
+        </AlertDialog.Header>
+        <AlertDialog.Footer>
+          <AlertDialog.Cancel disabled={deleting}>Cancel</AlertDialog.Cancel>
+          <AlertDialog.Action variant="destructive" onclick={deleteEmail} disabled={deleting}>
+            {deleting ? "Deleting..." : "Delete email"}
+          </AlertDialog.Action>
+        </AlertDialog.Footer>
+      </AlertDialog.Content>
+    </AlertDialog.Root>
   </div>
 
   {#if loading}
