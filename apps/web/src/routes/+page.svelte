@@ -1,14 +1,14 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { api } from "$lib/api";
-  import { PUBLIC_APP_DOMAIN, PUBLIC_EMAIL_DOMAIN } from "$env/static/public";
+  import { env } from "$env/dynamic/public";
   import { Mail, Clock, Zap, Shield } from "@lucide/svelte";
 
   let localPart = $state("");
   let ttlMinutes = $state(60);
   let loading = $state(false);
   let error = $state("");
-  const emailDomain = PUBLIC_EMAIL_DOMAIN || PUBLIC_APP_DOMAIN || "localhost";
+  const emailDomain = env.PUBLIC_EMAIL_DOMAIN || env.PUBLIC_APP_DOMAIN || "localhost";
 
   async function createInbox() {
     loading = true;
