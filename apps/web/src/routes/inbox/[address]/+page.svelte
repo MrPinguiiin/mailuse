@@ -1,12 +1,14 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import * as AlertDialog from "$lib/components/ui/alert-dialog";
+  import InboxSidebar from "$lib/components/inbox-sidebar.svelte";
   import { Badge } from "$lib/components/ui/badge";
-  import { Button } from "$lib/components/ui/button";
+  import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Card from "$lib/components/ui/card";
   import { Separator } from "$lib/components/ui/separator";
   import { Skeleton } from "$lib/components/ui/skeleton";
   import { api } from "$lib/api";
-  import { rememberInbox } from "$lib/recent-inboxes";
+  import { forgetInbox, rememberInbox } from "$lib/recent-inboxes";
   import { cn } from "$lib/utils";
   import { timeAgo, formatBytes, timeRemaining } from "$lib/utils";
   import { Check, Clock, Copy, Inbox, Mail, RefreshCw, ShieldCheck, Trash2, Zap } from "@lucide/svelte";
@@ -20,6 +22,7 @@
   let loading = $state(true);
   let error = $state("");
   let copied = $state(false);
+  let deleting = $state(false);
   let refreshing = $state(false);
   let pollingTick = $state(0);
   let secondsUntilPoll = $state(POLLING_INTERVAL_MS / 1000);
@@ -59,12 +62,14 @@
   }
 
   async function deleteInbox() {
-    if (!confirm("Delete this inbox and all emails?")) return;
+    deleting = true;
     try {
       await api.deleteInbox(address);
+      forgetInbox(address);
       window.location.href = "/new";
     } catch (e: any) {
       error = e.message;
+      deleting = false;
     }
   }
 
@@ -110,8 +115,9 @@
   <title>{address} - mailuse</title>
 </svelte:head>
 
-<div class="min-h-[calc(100vh-4rem)] bg-[radial-gradient(circle_at_top_left,rgba(24,24,27,0.08),transparent_32rem)] px-4 py-6 dark:bg-[radial-gradient(circle_at_top_left,rgba(244,244,245,0.08),transparent_32rem)] sm:py-10">
-  <div class="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+<div class="flex min-h-[calc(100vh-4rem)] bg-[radial-gradient(circle_at_top_left,rgba(24,24,27,0.08),transparent_32rem)] dark:bg-[radial-gradient(circle_at_top_left,rgba(244,244,245,0.08),transparent_32rem)]">
+  <InboxSidebar domain={inbox?.domain || address.split("@")[1] || "localhost"} activeAddress={address} />
+  <div class="mx-auto grid w-full max-w-6xl gap-6 px-4 py-6 sm:py-10 lg:grid-cols-[360px_minmax(0,1fr)]">
     <aside class="space-y-4">
       <Card.Root class="overflow-hidden border-zinc-200/80 bg-white/85 shadow-sm backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/80">
         <Card.Header class="space-y-4">
@@ -183,9 +189,25 @@
             <Button variant="outline" size="icon" onclick={refresh} title="Refresh inbox">
               <RefreshCw class={cn("size-4", refreshing && "animate-spin")} />
             </Button>
-            <Button variant="destructive" size="icon" onclick={deleteInbox} title="Delete inbox">
-              <Trash2 class="size-4" />
-            </Button>
+            <AlertDialog.Root>
+              <AlertDialog.Trigger class={cn(buttonVariants({ variant: "destructive", size: "icon" }))} title="Delete inbox">
+                <Trash2 class="size-4" />
+              </AlertDialog.Trigger>
+              <AlertDialog.Content>
+                <AlertDialog.Header>
+                  <AlertDialog.Title>Delete this inbox?</AlertDialog.Title>
+                  <AlertDialog.Description>
+                    This will permanently remove <span class="font-mono">{address}</span> and all emails inside it. This action cannot be undone.
+                  </AlertDialog.Description>
+                </AlertDialog.Header>
+                <AlertDialog.Footer>
+                  <AlertDialog.Cancel disabled={deleting}>Cancel</AlertDialog.Cancel>
+                  <AlertDialog.Action variant="destructive" onclick={deleteInbox} disabled={deleting}>
+                    {deleting ? "Deleting..." : "Delete inbox"}
+                  </AlertDialog.Action>
+                </AlertDialog.Footer>
+              </AlertDialog.Content>
+            </AlertDialog.Root>
           </div>
         </Card.Content>
       </Card.Root>

@@ -44,3 +44,11 @@ export function rememberInbox(inbox: Pick<Inbox, "address" | "expiresAt">) {
 	localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
 	return next;
 }
+
+export function forgetInbox(address: string) {
+	if (typeof localStorage === "undefined") return [];
+
+	const next = getRecentInboxes().filter((item) => item.address !== address);
+	localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+	return next;
+}
