@@ -17,16 +17,24 @@
       class="flex items-center gap-4 text-sm text-zinc-600 dark:text-zinc-400"
     >
       <a
-        href="/new"
+        href="/#features"
         class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
       >
-        New Inbox
+        Features
       </a>
       <a
         href="/docs"
         class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
       >
         Docs
+      </a>
+      <a
+        href="https://github.com/MrPinguiiin/mailuse"
+        class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+        target="_blank"
+        rel="noreferrer"
+      >
+        GitHub
       </a>
     </nav>
   </div>
