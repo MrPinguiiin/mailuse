@@ -15,15 +15,18 @@ RUN bun install
 FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
+COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
 COPY . .
 WORKDIR /app/packages/db
-RUN bunx prisma generate
+RUN bun run db:generate
 WORKDIR /app/apps/api
 RUN bun run build
 
 # Production
 FROM base AS production
 COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/packages/db/package.json ./packages/db/package.json
+COPY --from=build /app/packages/db/node_modules ./packages/db/node_modules
 COPY --from=build /app/apps/api/dist ./dist
 COPY --from=build /app/packages/db/prisma/generated ./packages/db/prisma/generated
 COPY --from=build /app/packages/db/prisma/schema ./packages/db/prisma/schema

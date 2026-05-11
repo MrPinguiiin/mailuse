@@ -95,7 +95,7 @@ services:
       STORAGE_REGION: auto
       DEPLOY_MODE: docker
       AUTO_CREATE_INBOX: "true"
-    command: ["bunx", "prisma", "db", "push", "--schema", "./packages/db/prisma/schema", "--accept-data-loss"]
+    command: ["sh", "-c", "cd packages/db && bun run db:deploy"]
     depends_on:
       postgres:
         condition: service_healthy
