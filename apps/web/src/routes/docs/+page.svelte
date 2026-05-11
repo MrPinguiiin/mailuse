@@ -5,25 +5,25 @@
     {
       title: "Self-hosting",
       href: "/docs/self-hosting",
-      description: "Run mailuse on a VPS with Docker, SMTP, Postgres, and MinIO.",
+      description: "Prepare DNS, install Docker stack, verify SMTP, and debug production.",
       icon: Server,
     },
     {
       title: "Docker deploy",
       href: "/docs/docker",
-      description: "Production compose stack, environment variables, and service ports.",
+      description: "Production compose stack, owner password, variables, logs, and services.",
       icon: Container,
     },
     {
       title: "DNS & mail routing",
       href: "/docs/dns",
-      description: "MX, A records, port 25, firewall, and SMTP testing.",
+      description: "MX, A records, dashboard/API/inbox subdomains, and SMTP testing.",
       icon: Globe2,
     },
     {
       title: "API reference",
       href: "/docs/api",
-      description: "REST endpoints for inbox lifecycle and email access.",
+      description: "Public inbox endpoints and owner-only dashboard API endpoints.",
       icon: Code2,
     },
   ];
@@ -47,7 +47,7 @@
       mailuse docs
     </h1>
     <p class="max-w-2xl text-lg text-zinc-600 dark:text-zinc-400">
-      Self-hosted disposable email with a SvelteKit dashboard, Hono REST API, SMTP receiver, and Docker-first deployment.
+      Self-hosted disposable email with public inbox UI, private owner dashboard, Hono REST API, SMTP receiver, and Docker-first deployment.
     </p>
   </div>
 
@@ -74,8 +74,7 @@
       Domain setup pattern
     </div>
     <p class="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-      Use your main domain for the app, for example <code class="rounded bg-zinc-200 px-1 py-0.5 dark:bg-zinc-800">yourdomain.com</code>,
-      and point <code class="rounded bg-zinc-200 px-1 py-0.5 dark:bg-zinc-800">docs.yourdomain.com</code> to this docs section.
+      Keep the public landing/docs on Vercel, then point <code class="rounded bg-zinc-200 px-1 py-0.5 dark:bg-zinc-800">api</code>, <code class="rounded bg-zinc-200 px-1 py-0.5 dark:bg-zinc-800">inbox</code>, <code class="rounded bg-zinc-200 px-1 py-0.5 dark:bg-zinc-800">dashboard</code>, and <code class="rounded bg-zinc-200 px-1 py-0.5 dark:bg-zinc-800">mail</code> to the VPS.
     </p>
   </div>
 </div>
