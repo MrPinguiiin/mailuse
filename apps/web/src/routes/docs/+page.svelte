@@ -37,7 +37,7 @@
   />
 </svelte:head>
 
-<div class="container mx-auto max-w-5xl px-4 py-12">
+<div class="max-w-4xl">
   <div class="mb-10 rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
     <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
       <BookOpen class="h-3.5 w-3.5" />
