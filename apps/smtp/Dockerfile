@@ -14,6 +14,7 @@ RUN bun install
 # Build
 FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/smtp/node_modules ./apps/smtp/node_modules
 COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
 COPY . .
 WORKDIR /app/packages/db
