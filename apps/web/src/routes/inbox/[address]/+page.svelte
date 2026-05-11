@@ -6,6 +6,7 @@
   import { Separator } from "$lib/components/ui/separator";
   import { Skeleton } from "$lib/components/ui/skeleton";
   import { api } from "$lib/api";
+  import { rememberInbox } from "$lib/recent-inboxes";
   import { cn } from "$lib/utils";
   import { timeAgo, formatBytes, timeRemaining } from "$lib/utils";
   import { Check, Clock, Copy, Inbox, Mail, RefreshCw, ShieldCheck, Trash2, Zap } from "@lucide/svelte";
@@ -30,6 +31,7 @@
   async function loadInbox() {
     try {
       inbox = await api.getInbox(address);
+      rememberInbox(inbox);
     } catch (e: any) {
       error = e.message;
     }
