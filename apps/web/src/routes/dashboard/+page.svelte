@@ -5,7 +5,7 @@
   import { Badge } from "$lib/components/ui/badge";
   import { Separator } from "$lib/components/ui/separator";
   import { formatBytes, timeAgo, timeRemaining } from "$lib/utils";
-  import { BarChart3, KeyRound, Lock, Mail, RefreshCw, ShieldCheck } from "@lucide/svelte";
+  import { BarChart3, KeyRound, Lock, Mail, RefreshCw, ShieldCheck } from "lucide-svelte";
   import { onMount } from "svelte";
 
   const TOKEN_KEY = "mailuse:owner-token";
@@ -135,11 +135,12 @@
           ["Total emails", stats?.totalEmails ?? 0, Mail],
           ["24h emails", stats?.emailsToday ?? 0, BarChart3],
         ] as item}
+          {@const Icon = item[2]}
           <Card.Root>
             <Card.Content class="p-4">
               <div class="mb-3 flex items-center justify-between">
                 <p class="text-xs text-muted-foreground">{item[0]}</p>
-                <svelte:component this={item[2]} class="size-4 text-muted-foreground" />
+                <Icon class="size-4 text-muted-foreground" />
               </div>
               <p class="text-2xl font-semibold">{item[1]}</p>
             </Card.Content>

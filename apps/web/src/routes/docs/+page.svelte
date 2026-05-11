@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BookOpen, Cloud, Code2, Container, Globe2, Server } from "@lucide/svelte";
+  import { BookOpen, Cloud, Code2, Container, Globe2, Server } from "lucide-svelte";
 
   const cards = [
     {
@@ -53,11 +53,12 @@
 
   <div class="grid gap-4 sm:grid-cols-2">
     {#each cards as card}
+      {@const Icon = card.icon}
       <a
         href={card.href}
         class="group rounded-xl border border-zinc-200 bg-white p-5 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-600"
       >
-        <svelte:component this={card.icon} class="mb-4 h-5 w-5 text-zinc-500" />
+        <Icon class="mb-4 h-5 w-5 text-zinc-500" />
         <h2 class="mb-1 text-base font-semibold text-zinc-950 dark:text-zinc-50">
           {card.title}
         </h2>

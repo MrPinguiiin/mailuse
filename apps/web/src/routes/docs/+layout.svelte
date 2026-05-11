@@ -10,7 +10,7 @@
     Rocket,
     Search,
     Server,
-  } from "@lucide/svelte";
+  } from "lucide-svelte";
 
   const groups = [
     {
@@ -81,13 +81,14 @@
           <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-400">{group.title}</p>
           <div class="space-y-1">
             {#each group.links as link}
+              {@const Icon = link.icon}
               <a
                 href={link.href}
                 class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors {isActive(link.href)
                   ? 'bg-zinc-100 font-semibold text-zinc-950 dark:bg-zinc-900 dark:text-zinc-50'
                   : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50'}"
               >
-                <svelte:component this={link.icon} class="h-4 w-4" />
+                <Icon class="h-4 w-4" />
                 {link.label}
               </a>
             {/each}

@@ -8,7 +8,7 @@
   import { Separator } from "$lib/components/ui/separator";
   import { api } from "$lib/api";
   import { getRecentInboxes, rememberInbox, type RecentInbox } from "$lib/recent-inboxes";
-  import { Inbox, Plus, RefreshCw, ShieldCheck, Timer, Zap } from "@lucide/svelte";
+  import { Inbox, Plus, RefreshCw, ShieldCheck, Timer, Zap } from "lucide-svelte";
   import { onMount } from "svelte";
 
   let localPart = $state("");

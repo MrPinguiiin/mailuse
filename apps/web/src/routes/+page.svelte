@@ -10,7 +10,7 @@
     Shield,
     TimerReset,
     Zap,
-  } from "@lucide/svelte";
+  } from "lucide-svelte";
 
   const features = [
     {
@@ -34,8 +34,8 @@
       icon: Server,
     },
     {
-      title: "REST API",
-      description: "Create inboxes, list emails, read bodies, and delete data through simple JSON endpoints.",
+      title: "Owner dashboard",
+      description: "Monitor inboxes and emails, then generate an owner API token from a private dashboard.",
       icon: Code2,
     },
     {
@@ -68,7 +68,7 @@
         </h1>
 
         <p class="mt-6 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-          mailuse is an open-source disposable email kit for people who want to run the inbox service on their own VPS. Deploy the SMTP receiver, REST API, and dashboard under your own domain.
+          mailuse is an open-source disposable email kit for people who want to run the inbox service on their own VPS. Deploy the SMTP receiver, REST API, public inbox UI, and private owner dashboard under your own domain.
         </p>
 
         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -134,7 +134,7 @@
       <span>Docker ready</span>
       <span>No tracking</span>
       <span>Self hosted</span>
-      <span>REST API</span>
+      <span>Owner dashboard</span>
     </div>
   </div>
 
@@ -146,8 +146,9 @@
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {#each features as feature}
+        {@const Icon = feature.icon}
         <div class="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <svelte:component this={feature.icon} class="mb-4 h-5 w-5 text-zinc-500" />
+          <Icon class="mb-4 h-5 w-5 text-zinc-500" />
           <h3 class="mb-2 font-semibold text-zinc-950 dark:text-zinc-50">{feature.title}</h3>
           <p class="text-sm leading-6 text-zinc-600 dark:text-zinc-400">{feature.description}</p>
         </div>
@@ -161,7 +162,7 @@
         <p class="mb-2 text-sm font-semibold uppercase tracking-widest text-zinc-500">Ready to deploy?</p>
         <h2 class="text-4xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Install it on your VPS.</h2>
         <p class="mt-4 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          The public website only hosts documentation. The actual inbox service runs on your server so SMTP, data, and storage stay under your control.
+          The public website only hosts documentation. The actual inbox service runs on your server so SMTP, data, owner dashboard, and storage stay under your control.
         </p>
       </div>
 
@@ -169,8 +170,10 @@
         <div class="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-zinc-400">
           <Container class="h-4 w-4" /> Docker quick start
         </div>
-        <pre class="overflow-x-auto text-sm leading-7"><code>curl -fsSL https://raw.githubusercontent.com/MrPinguiiin/mailuse/main/docker-compose.production.yml -o docker-compose.yml
-DOMAIN=yourdomain.com docker compose up -d</code></pre>
+        <pre class="overflow-x-auto text-sm leading-7"><code>mkdir -p ~/mailuse-install
+cd ~/mailuse-install
+curl -fsSL https://raw.githubusercontent.com/MrPinguiiin/mailuse/main/docker-compose.production.yml -o docker-compose.yml
+DOMAIN=yourdomain.com OWNER_PASSWORD='change-this-owner-password' LETSENCRYPT_EMAIL=admin@yourdomain.com docker compose up -d</code></pre>
       </div>
     </div>
   </section>
