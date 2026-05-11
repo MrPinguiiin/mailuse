@@ -58,6 +58,18 @@
         "typescript": "catalog:",
       },
     },
+    "apps/updater": {
+      "name": "@mailuse/updater",
+      "dependencies": {
+        "@mailuse/db": "workspace:*",
+        "@mailuse/env": "workspace:*",
+        "hono": "catalog:",
+      },
+      "devDependencies": {
+        "@types/bun": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
     "apps/web": {
       "name": "web",
       "version": "0.0.1",
@@ -69,6 +81,7 @@
       "devDependencies": {
         "@fontsource-variable/geist": "^5.2.8",
         "@internationalized/date": "^3.12.0",
+        "@lucide/svelte": "^1.14.0",
         "@mailuse/config": "workspace:*",
         "@sveltejs/adapter-auto": "^7.0.1",
         "@sveltejs/adapter-node": "^5.0.0",
@@ -380,6 +393,8 @@
 
     "@kurkle/color": ["@kurkle/color@0.3.4", "", {}, "sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w=="],
 
+    "@lucide/svelte": ["@lucide/svelte@1.14.0", "", { "peerDependencies": { "svelte": "^5" } }, "sha512-MVuP5VRCBQa2OaIpaRbuEV4k5OV2dy9MyxA6Tf4Sz/IN0v3zzUU72ObHc9r2Zn/wSMXDg6lLrHrczqI7w7gCzQ=="],
+
     "@mailuse/api": ["@mailuse/api@workspace:apps/api"],
 
     "@mailuse/cli": ["@mailuse/cli@workspace:packages/cli"],
@@ -393,6 +408,8 @@
     "@mailuse/shared": ["@mailuse/shared@workspace:packages/shared"],
 
     "@mailuse/smtp": ["@mailuse/smtp@workspace:apps/smtp"],
+
+    "@mailuse/updater": ["@mailuse/updater@workspace:apps/updater"],
 
     "@mapbox/node-pre-gyp": ["@mapbox/node-pre-gyp@2.0.3", "", { "dependencies": { "consola": "^3.2.3", "detect-libc": "^2.0.0", "https-proxy-agent": "^7.0.5", "node-fetch": "^2.6.7", "nopt": "^8.0.0", "semver": "^7.5.3", "tar": "^7.4.0" }, "bin": { "node-pre-gyp": "bin/node-pre-gyp" } }, "sha512-uwPAhccfFJlsfCxMYTwOdVfOz3xqyj8xYL3zJj8f0pb30tLohnnFPhLuqp4/qoEz8sNxe4SESZedcBojRefIzg=="],
 

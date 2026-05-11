@@ -16,6 +16,9 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
     CORS_ORIGIN: z.string().default("http://localhost:5173"),
     OWNER_PASSWORD: z.string().min(8).optional(),
+    APP_VERSION: z.string().default("dev"),
+    UPDATE_BACKUP_RETENTION_DAYS: z.coerce.number().int().min(1).default(3),
+    UPDATE_RATE_LIMIT_MINUTES: z.coerce.number().int().min(1).default(5),
 
     // Storage (S3/MinIO/R2)
     STORAGE_ENDPOINT: z.string().default("http://localhost:9000"),

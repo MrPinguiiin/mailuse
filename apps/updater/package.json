@@ -1,0 +1,16 @@
+{
+  "name": "@mailuse/updater",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "@mailuse/db": "workspace:*",
+    "@mailuse/env": "workspace:*",
+    "hono": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
+  }
+}

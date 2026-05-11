@@ -9,8 +9,8 @@
   import { onMount } from "svelte";
 
   const TOKEN_KEY = "mailuse:owner-token";
-  const UPDATE_SEEN_KEY = "mailuse:last-seen-update-sha";
-  const REPO_COMMITS_URL = "https://api.github.com/repos/MrPinguiiin/mailuse/commits/main";
+  const UPDATE_SEEN_KEY = "mailuse:last-seen-release";
+  const REPO_RELEASE_URL = "https://api.github.com/repos/MrPinguiiin/mailuse/releases/latest";
   const UPDATE_COMMAND = `cd ~/mailuse-install
 curl -fsSL https://raw.githubusercontent.com/MrPinguiiin/mailuse/main/docker-compose.production.yml -o docker-compose.yml
 DOMAIN=yourdomain.com OWNER_PASSWORD='your-owner-password' LETSENCRYPT_EMAIL=admin@yourdomain.com docker compose up -d --build`;
@@ -22,7 +22,7 @@ DOMAIN=yourdomain.com OWNER_PASSWORD='your-owner-password' LETSENCRYPT_EMAIL=adm
   let stats = $state<any>(null);
   let inboxes = $state<any[]>([]);
   let apiInfo = $state<{ token: string; endpoints: Array<{ method: string; path: string; description: string }> } | null>(null);
-  let latestUpdate = $state<{ sha: string; message: string; url: string; date: string } | null>(null);
+  let latestUpdate = $state<{ version: string; message: string; url: string; date: string } | null>(null);
   let updateAvailable = $state(false);
 
   async function login() {
@@ -76,24 +76,24 @@ DOMAIN=yourdomain.com OWNER_PASSWORD='your-owner-password' LETSENCRYPT_EMAIL=adm
 
   async function checkForUpdates() {
     try {
-      const res = await fetch(REPO_COMMITS_URL, { headers: { Accept: "application/vnd.github+json" } });
+      const res = await fetch(REPO_RELEASE_URL, { headers: { Accept: "application/vnd.github+json" } });
       if (!res.ok) return;
       const data = await res.json();
       latestUpdate = {
-        sha: data.sha,
-        message: data.commit?.message?.split("\n")[0] || "New mailuse update",
+        version: data.tag_name,
+        message: data.name || data.tag_name || "New mailuse release",
         url: data.html_url,
-        date: data.commit?.committer?.date || data.commit?.author?.date || new Date().toISOString(),
+        date: data.published_at || new Date().toISOString(),
       };
 
-      const seenSha = localStorage.getItem(UPDATE_SEEN_KEY);
-      if (!seenSha) {
-        localStorage.setItem(UPDATE_SEEN_KEY, data.sha);
+      const seenRelease = localStorage.getItem(UPDATE_SEEN_KEY);
+      if (!seenRelease) {
+        localStorage.setItem(UPDATE_SEEN_KEY, data.tag_name);
         updateAvailable = false;
         return;
       }
 
-      updateAvailable = seenSha !== data.sha;
+      updateAvailable = seenRelease !== data.tag_name;
     } catch {
       // Update checks should never block dashboard usage.
     }
@@ -101,7 +101,7 @@ DOMAIN=yourdomain.com OWNER_PASSWORD='your-owner-password' LETSENCRYPT_EMAIL=adm
 
   function dismissUpdate() {
     if (!latestUpdate) return;
-    localStorage.setItem(UPDATE_SEEN_KEY, latestUpdate.sha);
+    localStorage.setItem(UPDATE_SEEN_KEY, latestUpdate.version);
     updateAvailable = false;
   }
 
@@ -181,10 +181,10 @@ DOMAIN=yourdomain.com OWNER_PASSWORD='your-owner-password' LETSENCRYPT_EMAIL=adm
                 <div>
                   <div class="mb-1 flex flex-wrap items-center gap-2">
                     <h2 class="font-semibold">{updateAvailable ? "Update available" : "mailuse is being watched"}</h2>
-                    <Badge variant={updateAvailable ? "secondary" : "outline"}>{latestUpdate.sha.slice(0, 7)}</Badge>
+                    <Badge variant={updateAvailable ? "secondary" : "outline"}>{latestUpdate.version}</Badge>
                   </div>
                   <p class="text-sm text-muted-foreground">{latestUpdate.message}</p>
-                  <p class="mt-1 text-xs text-muted-foreground">Latest upstream commit {timeAgo(latestUpdate.date)}</p>
+                  <p class="mt-1 text-xs text-muted-foreground">Latest release {timeAgo(latestUpdate.date)}</p>
                 </div>
               </div>
               <div class="flex flex-wrap gap-2">

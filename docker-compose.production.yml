@@ -87,6 +87,8 @@ services:
       STORAGE_REGION: auto
       DEPLOY_MODE: docker
       AUTO_CREATE_INBOX: "true"
+      APP_VERSION: ${APP_VERSION:-dev}
+      UPDATER_URL: http://updater:3010
     command: ["sh", "-c", "cd /app/packages/db && bun run db:deploy"]
     depends_on:
       postgres:
@@ -115,6 +117,8 @@ services:
       STORAGE_REGION: auto
       DEPLOY_MODE: docker
       AUTO_CREATE_INBOX: "true"
+      APP_VERSION: ${APP_VERSION:-dev}
+      UPDATER_URL: http://updater:3010
     labels:
       - traefik.enable=true
       - traefik.http.routers.mailuse-api.rule=Host(`api.${DOMAIN:-localhost}`)
@@ -187,7 +191,33 @@ services:
       minio-init:
         condition: service_completed_successfully
 
+  updater:
+    build:
+      context: https://github.com/MrPinguiiin/mailuse.git#main
+      dockerfile: apps/updater/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://mailuse:${POSTGRES_PASSWORD:-mailuse}@postgres:5432/mailuse
+      DOMAIN: ${DOMAIN:-localhost}
+      APP_DOMAIN: ${DOMAIN:-localhost}
+      APP_NAME: ${APP_NAME:-mailuse}
+      APP_VERSION: ${APP_VERSION:-dev}
+      OWNER_PASSWORD: ${OWNER_PASSWORD:-}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-admin@${DOMAIN:-localhost}}
+      UPDATE_BACKUP_RETENTION_DAYS: ${UPDATE_BACKUP_RETENTION_DAYS:-3}
+      UPDATE_RATE_LIMIT_MINUTES: ${UPDATE_RATE_LIMIT_MINUTES:-5}
+      INSTALL_DIR: /root/mailuse-install
+      BACKUP_DIR: /app/backups
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/root/mailuse-install
+      - update_backups:/app/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   minio_data:
   letsencrypt_data:
+  update_backups:

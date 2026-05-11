@@ -110,4 +110,24 @@ export const api = {
   async ownerApi(token: string) {
     return fetchOwnerJson<{ token: string; endpoints: Array<{ method: string; path: string; description: string }> }>("/owner/api", token);
   },
+
+  async ownerLatestUpdate(token: string) {
+    return fetchOwnerJson<{ currentVersion: string; latestVersion: string; name: string; url: string; publishedAt: string; body: string; updateAvailable: boolean }>("/owner/update/latest", token);
+  },
+
+  async ownerTriggerUpdate(token: string) {
+    return fetchOwnerJson<{ jobId: string; releaseTag: string }>("/owner/update/trigger", token, { method: "POST" });
+  },
+
+  async ownerUpdateStatus(token: string, jobId: string) {
+    return fetchOwnerJson<any>(`/owner/update/status/${jobId}`, token);
+  },
+
+  async ownerUpdateHistory(token: string) {
+    return fetchOwnerJson<{ jobs: any[] }>("/owner/update/history", token);
+  },
+
+  async ownerRollback(token: string, jobId: string) {
+    return fetchOwnerJson<{ jobId: string }>(`/owner/update/rollback/${jobId}`, token, { method: "POST" });
+  },
 };

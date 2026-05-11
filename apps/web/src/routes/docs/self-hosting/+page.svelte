@@ -71,5 +71,18 @@ dig MX yourdomain.com +short</code></pre>
         <li>If dashboard login fails repeatedly, wait for the rate-limit window or restart API.</li>
       </ul>
     </div>
+
+    <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+      <h2 class="mb-3 text-lg font-semibold">7. Owner updates</h2>
+      <p class="mb-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+        The owner dashboard checks GitHub Releases, not commit hashes. When a new release exists, open <code>dashboard.yourdomain.com/dashboard/updates</code> and trigger the update manually.
+      </p>
+      <ul class="list-disc space-y-2 pl-5 text-sm text-zinc-600 dark:text-zinc-400">
+        <li>Updates are owner-only and require the dashboard token.</li>
+        <li>Only one update can run at a time.</li>
+        <li>Update attempts are audited in <code>dashboard.yourdomain.com/dashboard/history</code>.</li>
+        <li>Database backups are kept for <code>3</code> days by default.</li>
+      </ul>
+    </div>
   </section>
 </article>

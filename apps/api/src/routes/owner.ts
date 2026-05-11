@@ -1,5 +1,6 @@
 import { env } from "@mailuse/env/server";
 import prisma from "@mailuse/db";
+import { generateId } from "@mailuse/shared/id";
 import { Hono } from "hono";
 import { createHash, timingSafeEqual } from "node:crypto";
 
@@ -8,6 +9,8 @@ export const ownerRoutes = new Hono();
 const loginAttempts = new Map<string, { count: number; resetAt: number }>();
 const LOGIN_WINDOW_MS = 10 * 60 * 1000;
 const MAX_LOGIN_ATTEMPTS = 5;
+const GITHUB_RELEASE_URL = "https://api.github.com/repos/MrPinguiiin/mailuse/releases/latest";
+const UPDATER_URL = process.env.UPDATER_URL || "http://updater:3010";
 
 function ownerToken() {
   const secret = env.OWNER_PASSWORD || "";
@@ -129,4 +132,122 @@ ownerRoutes.get("/owner/api", (c) => {
       { method: "DELETE", path: "/api/v1/inboxes/:address", description: "Delete inbox" },
     ],
   });
+});
+
+ownerRoutes.get("/owner/update/latest", async (c) => {
+  const unauthorized = requireOwner(c);
+  if (unauthorized) return unauthorized;
+
+  const res = await fetch(GITHUB_RELEASE_URL, { headers: { "User-Agent": "mailuse" } });
+  if (!res.ok) return c.json({ error: "No GitHub release found" }, 502);
+  const release = await res.json();
+
+  return c.json({
+    currentVersion: env.APP_VERSION,
+    latestVersion: release.tag_name,
+    name: release.name || release.tag_name,
+    url: release.html_url,
+    publishedAt: release.published_at,
+    body: release.body || "",
+    updateAvailable: release.tag_name !== env.APP_VERSION,
+  });
+});
+
+ownerRoutes.post("/owner/update/trigger", async (c) => {
+  const unauthorized = requireOwner(c);
+  if (unauthorized) return unauthorized;
+
+  const latest = await fetch(GITHUB_RELEASE_URL, { headers: { "User-Agent": "mailuse" } });
+  if (!latest.ok) return c.json({ error: "Failed to fetch latest release" }, 502);
+  const release = await latest.json();
+
+  const recent = await prisma.updateJob.findFirst({
+    where: { startedAt: { gte: new Date(Date.now() - env.UPDATE_RATE_LIMIT_MINUTES * 60 * 1000) } },
+  });
+  if (recent) return c.json({ error: `Rate limited: wait ${env.UPDATE_RATE_LIMIT_MINUTES} minutes between updates` }, 429);
+
+  const running = await prisma.updateJob.findFirst({ where: { status: { in: ["pending", "running"] } } });
+  if (running) return c.json({ error: "Update already in progress", jobId: running.id }, 409);
+
+  const job = await prisma.updateJob.create({
+    data: {
+      id: generateId("upd"),
+      triggeredBy: "owner",
+      triggeredByIp: clientIp(c),
+      fromVersion: env.APP_VERSION,
+      toVersion: release.tag_name,
+      releaseName: release.name || release.tag_name,
+      releaseUrl: release.html_url,
+      status: "pending",
+      strategy: "blue-green",
+    },
+  });
+
+  const res = await fetch(`${UPDATER_URL}/run`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jobId: job.id, releaseTag: release.tag_name }),
+  }).catch((error) => ({ ok: false, error }) as any);
+
+  if (!res.ok) {
+    await prisma.updateJob.update({ where: { id: job.id }, data: { status: "failed", errorMessage: "Failed to start updater" } });
+    return c.json({ error: "Failed to start updater" }, 500);
+  }
+
+  return c.json({ jobId: job.id, releaseTag: release.tag_name }, 202);
+});
+
+ownerRoutes.get("/owner/update/status/:jobId", async (c) => {
+  const unauthorized = requireOwner(c);
+  if (unauthorized) return unauthorized;
+
+  const job = await prisma.updateJob.findUnique({ where: { id: c.req.param("jobId") } });
+  if (!job) return c.json({ error: "Job not found" }, 404);
+  return c.json(job);
+});
+
+ownerRoutes.get("/owner/update/history", async (c) => {
+  const unauthorized = requireOwner(c);
+  if (unauthorized) return unauthorized;
+
+  const jobs = await prisma.updateJob.findMany({ orderBy: { startedAt: "desc" }, take: 20 });
+  return c.json({ jobs });
+});
+
+ownerRoutes.post("/owner/update/rollback/:jobId", async (c) => {
+  const unauthorized = requireOwner(c);
+  if (unauthorized) return unauthorized;
+
+  const source = await prisma.updateJob.findUnique({ where: { id: c.req.param("jobId") } });
+  if (!source || source.status !== "success" || !source.backupPath) {
+    return c.json({ error: "This update cannot be rolled back" }, 400);
+  }
+
+  const job = await prisma.updateJob.create({
+    data: {
+      id: generateId("upd"),
+      triggeredBy: "owner",
+      triggeredByIp: clientIp(c),
+      fromVersion: source.toVersion,
+      toVersion: source.fromVersion,
+      releaseName: `Rollback to ${source.fromVersion}`,
+      releaseUrl: source.releaseUrl,
+      status: "pending",
+      strategy: "rollback",
+      rollbackJobId: source.id,
+    },
+  });
+
+  const res = await fetch(`${UPDATER_URL}/rollback`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jobId: job.id, sourceJobId: source.id }),
+  }).catch((error) => ({ ok: false, error }) as any);
+
+  if (!res.ok) {
+    await prisma.updateJob.update({ where: { id: job.id }, data: { status: "failed", errorMessage: "Failed to start rollback" } });
+    return c.json({ error: "Failed to start rollback" }, 500);
+  }
+
+  return c.json({ jobId: job.id }, 202);
 });
