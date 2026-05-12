@@ -107,6 +107,10 @@ export const api = {
     return fetchOwnerJson<{ inboxes: Array<{ address: string; expiresAt: string | null; createdAt: string; lastEmailAt: string | null; emailCount: number }> }>("/owner/inboxes", token);
   },
 
+  async ownerDomains(token: string) {
+    return fetchOwnerJson<{ domains: Array<{ id: string; domain: string; providerType: string; isActive: boolean; createdAt: string; inboxCount: number }> }>("/owner/domains", token);
+  },
+
   async ownerApi(token: string) {
     return fetchOwnerJson<{ token: string; endpoints: Array<{ method: string; path: string; description: string }> }>("/owner/api", token);
   },

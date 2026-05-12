@@ -117,6 +117,27 @@ ownerRoutes.get("/owner/inboxes", async (c) => {
   });
 });
 
+ownerRoutes.get("/owner/domains", async (c) => {
+  const unauthorized = requireOwner(c);
+  if (unauthorized) return unauthorized;
+
+  const domains = await prisma.domain.findMany({
+    orderBy: [{ isActive: "desc" }, { createdAt: "desc" }],
+    include: { _count: { select: { inboxes: true } } },
+  });
+
+  return c.json({
+    domains: domains.map((domain) => ({
+      id: domain.id,
+      domain: domain.domain,
+      providerType: domain.providerType,
+      isActive: domain.isActive,
+      createdAt: domain.createdAt.toISOString(),
+      inboxCount: domain._count.inboxes,
+    })),
+  });
+});
+
 ownerRoutes.get("/owner/api", (c) => {
   const unauthorized = requireOwner(c);
   if (unauthorized) return unauthorized;

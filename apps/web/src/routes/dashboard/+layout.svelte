@@ -1,12 +1,13 @@
 <script lang="ts">
   import { page } from "$app/state";
   import * as Sidebar from "$lib/components/ui/sidebar";
-  import { BarChart3, History, KeyRound, LogOut, RefreshCw } from "lucide-svelte";
+  import { BarChart3, Globe2, History, KeyRound, LogOut, RefreshCw } from "lucide-svelte";
 
   let { children } = $props();
 
   const links = [
     { href: "/dashboard", label: "Overview", icon: BarChart3 },
+    { href: "/dashboard/domains", label: "Domains", icon: Globe2 },
     { href: "/dashboard/updates", label: "Updates", icon: RefreshCw },
     { href: "/dashboard/history", label: "History", icon: History },
     { href: "/dashboard/api", label: "API", icon: KeyRound },
