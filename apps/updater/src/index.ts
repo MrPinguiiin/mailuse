@@ -58,6 +58,14 @@ function composeEnv(version = env.APP_VERSION) {
     .join(" ");
 }
 
+function composeUpAppServices(version = env.APP_VERSION) {
+  return `${composeEnv(version)} docker compose up -d postgres minio minio-init migrate api smtp web`;
+}
+
+function composeUpUpdaterInBackground(version = env.APP_VERSION) {
+  return `nohup bash -lc ${shellQuote(`sleep 2; cd ${INSTALL_DIR}; ${composeEnv(version)} docker compose up -d updater`)} >/tmp/mailuse-updater-self-update.log 2>&1 &`;
+}
+
 async function acquireLock(jobId: string) {
   const now = new Date();
   const existing = await prisma.updateLock.findUnique({ where: { id: LOCK_ID } });
@@ -111,7 +119,7 @@ async function executeUpdate(jobId: string, releaseTag: string) {
     await phase(jobId, "switch");
     await run(jobId, `mv docker-compose.yml docker-compose.yml.previous || true`);
     await run(jobId, `mv docker-compose.yml.next docker-compose.yml`);
-    await run(jobId, `${composeEnv(releaseTag)} docker compose up -d`);
+    await run(jobId, composeUpAppServices(releaseTag));
     await healthCheck(jobId);
     await phase(jobId, "cleanup");
     await run(jobId, `docker image prune -f`);
@@ -120,10 +128,12 @@ async function executeUpdate(jobId: string, releaseTag: string) {
       data: { status: "success", phase: "done", completedAt: new Date(), durationSeconds: Math.floor((Date.now() - started) / 1000) },
     });
     await appendLog(jobId, "Update completed successfully");
+    await appendLog(jobId, "Scheduling updater self-update");
+    await run(jobId, composeUpUpdaterInBackground(releaseTag));
   } catch (error: any) {
     await appendLog(jobId, `Update failed: ${error.message}`);
     await prisma.updateJob.update({ where: { id: jobId }, data: { status: "failed", errorMessage: error.message, errorStack: error.stack, completedAt: new Date() } });
-    await run(jobId, `test -f docker-compose.yml.previous && mv docker-compose.yml.previous docker-compose.yml && ${composeEnv()} docker compose up -d || true`).catch(() => null);
+    await run(jobId, `test -f docker-compose.yml.previous && mv docker-compose.yml.previous docker-compose.yml && ${composeUpAppServices()} || true`).catch(() => null);
   } finally {
     await releaseLock();
   }
@@ -136,9 +146,10 @@ async function executeRollback(jobId: string, sourceJobId: string) {
   try {
     await phase(jobId, "restore");
     await run(jobId, `docker exec -i mailuse-install-postgres-1 psql -U mailuse mailuse < ${source.backupPath}`);
-    await run(jobId, `test -f docker-compose.yml.previous && mv docker-compose.yml.previous docker-compose.yml && ${composeEnv(source.fromVersion)} docker compose up -d || ${composeEnv(source.fromVersion)} docker compose up -d`);
+    await run(jobId, `test -f docker-compose.yml.previous && mv docker-compose.yml.previous docker-compose.yml && ${composeUpAppServices(source.fromVersion)} || ${composeUpAppServices(source.fromVersion)}`);
     await healthCheck(jobId);
     await prisma.updateJob.update({ where: { id: jobId }, data: { status: "success", phase: "done", completedAt: new Date() } });
+    await run(jobId, composeUpUpdaterInBackground(source.fromVersion));
   } catch (error: any) {
     await prisma.updateJob.update({ where: { id: jobId }, data: { status: "failed", errorMessage: error.message, errorStack: error.stack, completedAt: new Date() } });
   } finally {
