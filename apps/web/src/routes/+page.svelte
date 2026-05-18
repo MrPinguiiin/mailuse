@@ -252,38 +252,62 @@
   </section>
 
   <section class="bg-[#FFF7E8] py-4 dark:bg-slate-950">
-    <div class="container mx-auto grid max-w-6xl items-stretch gap-6 px-4 py-16 lg:grid-cols-[0.88fr_1.12fr]">
-      <div class="relative rounded-[2rem] border-4 border-slate-900 bg-white p-6 shadow-[10px_10px_0_#0f172a] dark:bg-slate-900 sm:p-8">
-        <div class="absolute -right-3 -top-3 hidden rounded-2xl border-4 border-slate-900 bg-[#FFD166] p-3 shadow-[5px_5px_0_#0f172a] sm:block">
-          <Server class="h-7 w-7 text-slate-950" />
-        </div>
-        <p class="mb-4 inline-flex rounded-full border-2 border-slate-900 bg-[#FFE8A3] px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-950">
-          Ready to deploy?
-        </p>
-        <h2 class="max-w-lg text-4xl font-black leading-none tracking-tight sm:text-5xl">Install it on your VPS.</h2>
-        <p class="mt-5 max-w-xl text-base font-semibold leading-7 text-slate-700 dark:text-slate-300">
-          The public website only hosts documentation. The actual inbox service runs on your server, so SMTP, data, owner dashboard, and storage stay under your control.
-        </p>
-        <div class="mt-6 rounded-3xl border-4 border-slate-900 bg-[#8AE9C1] p-4 text-slate-950 shadow-[6px_6px_0_#0f172a]">
-          <div class="flex items-start gap-3">
-            <span class="rounded-2xl border-2 border-slate-900 bg-white p-2">
-              <CheckCircle2 class="h-5 w-5" />
+    <div class="container mx-auto grid max-w-6xl items-stretch gap-8 px-4 py-16 xl:grid-cols-[0.95fr_1.05fr]">
+      <div class="relative overflow-hidden rounded-[2rem] border-4 border-slate-900 bg-white p-6 shadow-[10px_10px_0_#0f172a] dark:bg-slate-900 sm:p-8">
+        <div class="absolute -right-10 -top-10 h-28 w-28 rounded-full border-4 border-slate-900 bg-[#FFD166]"></div>
+        <div class="absolute -bottom-12 right-16 h-24 w-24 rounded-full border-4 border-slate-900 bg-[#A5B4FC]"></div>
+
+        <div class="relative">
+          <div class="mb-6 flex flex-wrap items-center gap-3">
+            <p class="inline-flex rounded-full border-2 border-slate-900 bg-[#FFE8A3] px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-950">
+              Ready to deploy?
+            </p>
+            <span class="inline-flex items-center gap-2 rounded-full border-2 border-slate-900 bg-[#8AE9C1] px-3 py-1 text-xs font-black text-slate-950">
+              <Server class="h-3.5 w-3.5" /> VPS required
             </span>
-            <div>
-              <p class="font-black">Keep secrets persisted during updates.</p>
-              <p class="mt-1 text-sm font-semibold leading-6 text-slate-700">
-                Pass the same passwords and domain values when recreating the Docker stack.
-              </p>
+          </div>
+
+          <h2 class="max-w-2xl text-4xl font-black leading-[0.96] tracking-tight sm:text-5xl">Install it on your VPS.</h2>
+          <p class="mt-5 max-w-2xl text-base font-semibold leading-7 text-slate-700 dark:text-slate-300">
+            The public website only hosts documentation. The actual inbox service runs on your server, so SMTP, data, owner dashboard, and storage stay under your control.
+          </p>
+
+          <div class="mt-6 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+            <div class="rounded-2xl border-2 border-slate-900 bg-[#FFF7E8] p-3 text-sm font-black text-slate-950">
+              SMTP stays yours
+            </div>
+            <div class="rounded-2xl border-2 border-slate-900 bg-[#FFF7E8] p-3 text-sm font-black text-slate-950">
+              Dashboard private
+            </div>
+            <div class="rounded-2xl border-2 border-slate-900 bg-[#FFF7E8] p-3 text-sm font-black text-slate-950">
+              Storage controlled
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-3xl border-4 border-slate-900 bg-[#8AE9C1] p-4 text-slate-950 shadow-[6px_6px_0_#0f172a]">
+            <div class="flex items-start gap-3">
+              <span class="shrink-0 rounded-2xl border-2 border-slate-900 bg-white p-2">
+                <CheckCircle2 class="h-5 w-5" />
+              </span>
+              <div>
+                <p class="font-black">Keep secrets persisted during updates.</p>
+                <p class="mt-1 text-sm font-semibold leading-6 text-slate-700">
+                  Pass the same passwords and domain values when recreating the Docker stack.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="rounded-[2rem] border-4 border-slate-900 bg-slate-950 p-5 text-slate-100 shadow-[10px_10px_0_#6366f1] sm:p-6">
-        <div class="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#8AE9C1]">
-          <Container class="h-4 w-4" /> Docker quick start
+      <div class="min-w-0 rounded-[2rem] border-4 border-slate-900 bg-slate-950 p-5 text-slate-100 shadow-[10px_10px_0_#6366f1] sm:p-6">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3 border-b-4 border-slate-700 pb-4">
+          <div class="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#8AE9C1]">
+            <Container class="h-4 w-4" /> Docker quick start
+          </div>
+          <span class="rounded-full border-2 border-[#8AE9C1] px-3 py-1 text-xs font-black text-[#8AE9C1]">copy-ready</span>
         </div>
-        <pre class="overflow-x-auto text-sm leading-7"><code>mkdir -p ~/mailuse-install
+        <pre class="max-w-full overflow-x-auto whitespace-pre-wrap break-words text-sm leading-7"><code>mkdir -p ~/mailuse-install
 cd ~/mailuse-install
 curl -fsSL https://raw.githubusercontent.com/MrPinguiiin/mailuse/main/docker-compose.production.yml -o docker-compose.yml
 DOMAIN=yourdomain.com OWNER_PASSWORD='change-this-owner-password' LETSENCRYPT_EMAIL=admin@yourdomain.com docker compose up -d</code></pre>
