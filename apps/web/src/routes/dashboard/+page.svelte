@@ -23,6 +23,7 @@
       const result = await api.ownerLogin(password);
       token = result.token;
       localStorage.setItem(TOKEN_KEY, token);
+      window.dispatchEvent(new Event("mailuse:owner-login"));
       await loadDashboard();
     } catch (e: any) {
       error = e.message || "Login failed";
