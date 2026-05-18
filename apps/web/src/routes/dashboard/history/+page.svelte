@@ -37,6 +37,7 @@
     <div>
       <p class="text-sm text-muted-foreground">Updates</p>
       <h1 class="text-3xl font-semibold tracking-tight">Update history</h1>
+      <p class="mt-1 text-sm text-muted-foreground">Interrupted update jobs are marked failed automatically after they become stale.</p>
     </div>
     {#if error}<p class="text-sm text-red-600">{error}</p>{/if}
     <Card.Root>

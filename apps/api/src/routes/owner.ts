@@ -53,6 +53,25 @@ function requireOwner(c: any) {
   }
 }
 
+async function clearStaleUpdateJobs() {
+  const cutoff = new Date(Date.now() - STALE_UPDATE_MS);
+  const result = await prisma.updateJob.updateMany({
+    where: {
+      status: { in: ["pending", "running"] },
+      startedAt: { lt: cutoff },
+    },
+    data: {
+      status: "failed",
+      completedAt: new Date(),
+      errorMessage: "Marked failed automatically because the updater job became stale",
+    },
+  });
+
+  if (result.count > 0) {
+    await prisma.updateLock.deleteMany({});
+  }
+}
+
 ownerRoutes.post("/owner/login", async (c) => {
   if (!env.OWNER_PASSWORD) {
     return c.json({ error: "Set OWNER_PASSWORD to enable owner dashboard" }, 503);
@@ -159,6 +178,7 @@ ownerRoutes.get("/owner/api", (c) => {
 ownerRoutes.get("/owner/update/latest", async (c) => {
   const unauthorized = requireOwner(c);
   if (unauthorized) return unauthorized;
+  await clearStaleUpdateJobs();
 
   const res = await fetch(GITHUB_RELEASE_URL, { headers: { "User-Agent": "mailuse" } });
   if (!res.ok) return c.json({ error: "No GitHub release found" }, 502);
@@ -178,6 +198,7 @@ ownerRoutes.get("/owner/update/latest", async (c) => {
 ownerRoutes.post("/owner/update/trigger", async (c) => {
   const unauthorized = requireOwner(c);
   if (unauthorized) return unauthorized;
+  await clearStaleUpdateJobs();
 
   const latest = await fetch(GITHUB_RELEASE_URL, { headers: { "User-Agent": "mailuse" } });
   if (!latest.ok) return c.json({ error: "Failed to fetch latest release" }, 502);
@@ -188,22 +209,7 @@ ownerRoutes.post("/owner/update/trigger", async (c) => {
     orderBy: { startedAt: "desc" },
   });
 
-  if (running) {
-    const ageMs = Date.now() - running.startedAt.getTime();
-    if (ageMs < STALE_UPDATE_MS) {
-      return c.json({ error: "Update already in progress", jobId: running.id }, 409);
-    }
-
-    await prisma.updateJob.updateMany({
-      where: { status: { in: ["pending", "running"] } },
-      data: {
-        status: "failed",
-        completedAt: new Date(),
-        errorMessage: "Marked failed automatically because the updater job became stale",
-      },
-    });
-    await prisma.updateLock.deleteMany({});
-  }
+  if (running) return c.json({ error: "Update already in progress", jobId: running.id }, 409);
 
   const job = await prisma.updateJob.create({
     data: {
@@ -236,6 +242,7 @@ ownerRoutes.post("/owner/update/trigger", async (c) => {
 ownerRoutes.get("/owner/update/status/:jobId", async (c) => {
   const unauthorized = requireOwner(c);
   if (unauthorized) return unauthorized;
+  await clearStaleUpdateJobs();
 
   const job = await prisma.updateJob.findUnique({ where: { id: c.req.param("jobId") } });
   if (!job) return c.json({ error: "Job not found" }, 404);
@@ -245,6 +252,7 @@ ownerRoutes.get("/owner/update/status/:jobId", async (c) => {
 ownerRoutes.get("/owner/update/history", async (c) => {
   const unauthorized = requireOwner(c);
   if (unauthorized) return unauthorized;
+  await clearStaleUpdateJobs();
 
   const jobs = await prisma.updateJob.findMany({ orderBy: { startedAt: "desc" }, take: 20 });
   return c.json({ jobs });
