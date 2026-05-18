@@ -127,6 +127,10 @@ export const api = {
     return fetchOwnerJson<any>(`/owner/update/status/${jobId}`, token);
   },
 
+  async ownerActiveUpdate(token: string) {
+    return fetchOwnerJson<{ job: any | null }>("/owner/update/active", token);
+  },
+
   async ownerUpdateHistory(token: string) {
     return fetchOwnerJson<{ jobs: any[] }>("/owner/update/history", token);
   },

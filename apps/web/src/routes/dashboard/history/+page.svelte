@@ -3,6 +3,8 @@
   import { Button } from "$lib/components/ui/button";
   import * as Card from "$lib/components/ui/card";
   import { Badge } from "$lib/components/ui/badge";
+  import { Progress } from "$lib/components/ui/progress";
+  import { getUpdateLabel, getUpdateProgress } from "$lib/update-progress";
   import { timeAgo } from "$lib/utils";
   import { onMount } from "svelte";
 
@@ -54,6 +56,16 @@
                     <span class="font-mono text-xs">{job.fromVersion} -> {job.toVersion}</span>
                   </div>
                   <p class="text-sm text-muted-foreground">{job.releaseName || job.strategy} / {timeAgo(job.startedAt)}</p>
+                  {#if ["pending", "running"].includes(job.status)}
+                    <div class="mt-3 max-w-md space-y-2 rounded-lg bg-muted/40 p-3">
+                      <div class="flex items-center justify-between gap-3 text-sm">
+                        <span class="font-medium">{getUpdateLabel(job)}</span>
+                        <span class="text-xs text-muted-foreground">{getUpdateProgress(job)}%</span>
+                      </div>
+                      <Progress value={getUpdateProgress(job)} max={100} />
+                      <p class="text-xs text-muted-foreground">Status: {job.status}{job.phase ? ` / ${job.phase}` : ""}</p>
+                    </div>
+                  {/if}
                   {#if job.errorMessage}<p class="mt-2 text-sm text-red-600">{job.errorMessage}</p>{/if}
                 </div>
                 {#if job.status === "success" && job.backupPath}

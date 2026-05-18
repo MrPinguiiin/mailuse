@@ -4,6 +4,7 @@
   import * as Card from "$lib/components/ui/card";
   import { Badge } from "$lib/components/ui/badge";
   import { Progress } from "$lib/components/ui/progress";
+  import { getUpdateLabel, getUpdateProgress } from "$lib/update-progress";
   import { timeAgo } from "$lib/utils";
   import { ExternalLink, RefreshCw, Rocket } from "lucide-svelte";
   import { onMount } from "svelte";
@@ -18,35 +19,8 @@
   let error = $state("");
   let pollTimer: ReturnType<typeof setInterval> | null = null;
 
-  const phaseProgress: Record<string, number> = {
-    backup: 15,
-    pull: 30,
-    build: 55,
-    switch: 78,
-    health: 90,
-    cleanup: 97,
-    done: 100,
-  };
-
-  let updateProgress = $derived.by(() => {
-    if (!job) return 0;
-    if (job.status === "success") return 100;
-    if (job.status === "failed") return phaseProgress[job.phase] || 0;
-    return phaseProgress[job.phase] || 8;
-  });
-
-  let updateLabel = $derived.by(() => {
-    if (!job) return "Ready";
-    if (job.status === "success") return "Update completed";
-    if (job.status === "failed") return "Update failed";
-    if (job.phase === "backup") return "Backing up database";
-    if (job.phase === "pull") return "Fetching release files";
-    if (job.phase === "build") return "Building containers";
-    if (job.phase === "switch") return "Switching services";
-    if (job.phase === "health") return "Checking service health";
-    if (job.phase === "cleanup") return "Cleaning up images";
-    return "Preparing update";
-  });
+  let updateProgress = $derived(getUpdateProgress(job));
+  let updateLabel = $derived(getUpdateLabel(job));
 
   async function checkLatest() {
     if (!token) return;
@@ -77,6 +51,7 @@
 
   function startPolling(jobId: string) {
     if (pollTimer) clearInterval(pollTimer);
+    api.ownerUpdateStatus(token, jobId).then((nextJob) => (job = nextJob)).catch(() => null);
     pollTimer = setInterval(async () => {
       job = await api.ownerUpdateStatus(token, jobId);
       if (["success", "failed"].includes(job.status)) {
@@ -85,9 +60,18 @@
     }, 2000);
   }
 
+  async function resumeActiveUpdate() {
+    const result = await api.ownerActiveUpdate(token).catch(() => ({ job: null }));
+    if (result.job) {
+      job = result.job;
+      startPolling(result.job.id);
+    }
+  }
+
   onMount(() => {
     token = localStorage.getItem(TOKEN_KEY) || "";
     checkLatest();
+    resumeActiveUpdate();
     const interval = setInterval(checkLatest, CHECK_MS);
     return () => {
       clearInterval(interval);

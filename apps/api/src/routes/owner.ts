@@ -249,6 +249,19 @@ ownerRoutes.get("/owner/update/status/:jobId", async (c) => {
   return c.json(job);
 });
 
+ownerRoutes.get("/owner/update/active", async (c) => {
+  const unauthorized = requireOwner(c);
+  if (unauthorized) return unauthorized;
+  await clearStaleUpdateJobs();
+
+  const job = await prisma.updateJob.findFirst({
+    where: { status: { in: ["pending", "running"] } },
+    orderBy: { startedAt: "desc" },
+  });
+
+  return c.json({ job });
+});
+
 ownerRoutes.get("/owner/update/history", async (c) => {
   const unauthorized = requireOwner(c);
   if (unauthorized) return unauthorized;
