@@ -81,7 +81,7 @@
       "devDependencies": {
         "@fontsource-variable/geist": "^5.2.8",
         "@internationalized/date": "^3.12.0",
-        "@lucide/svelte": "^1.14.0",
+        "@lucide/svelte": "^1.3.0",
         "@mailuse/config": "workspace:*",
         "@sveltejs/adapter-auto": "^7.0.1",
         "@sveltejs/adapter-node": "^5.0.0",
@@ -393,7 +393,7 @@
 
     "@kurkle/color": ["@kurkle/color@0.3.4", "", {}, "sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w=="],
 
-    "@lucide/svelte": ["@lucide/svelte@1.14.0", "", { "peerDependencies": { "svelte": "^5" } }, "sha512-MVuP5VRCBQa2OaIpaRbuEV4k5OV2dy9MyxA6Tf4Sz/IN0v3zzUU72ObHc9r2Zn/wSMXDg6lLrHrczqI7w7gCzQ=="],
+    "@lucide/svelte": ["@lucide/svelte@1.3.0", "", { "peerDependencies": { "svelte": "^5" } }, "sha512-ZRjfWKklbD9Sjhnb6d7v8A3zSGwVHNTM8kOiObSUIiF4B2rU4zskWV7ysp5tY0wOPl7ttj2bXGQvAd6qOCVhIA=="],
 
     "@mailuse/api": ["@mailuse/api@workspace:apps/api"],
 
