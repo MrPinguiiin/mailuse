@@ -3,6 +3,7 @@
   import { Button } from "$lib/components/ui/button";
   import * as Card from "$lib/components/ui/card";
   import { Badge } from "$lib/components/ui/badge";
+  import { Progress } from "$lib/components/ui/progress";
   import { timeAgo } from "$lib/utils";
   import { ExternalLink, RefreshCw, Rocket } from "lucide-svelte";
   import { onMount } from "svelte";
@@ -16,6 +17,36 @@
   let loading = $state(false);
   let error = $state("");
   let pollTimer: ReturnType<typeof setInterval> | null = null;
+
+  const phaseProgress: Record<string, number> = {
+    backup: 15,
+    pull: 30,
+    build: 55,
+    switch: 78,
+    health: 90,
+    cleanup: 97,
+    done: 100,
+  };
+
+  let updateProgress = $derived.by(() => {
+    if (!job) return 0;
+    if (job.status === "success") return 100;
+    if (job.status === "failed") return phaseProgress[job.phase] || 0;
+    return phaseProgress[job.phase] || 8;
+  });
+
+  let updateLabel = $derived.by(() => {
+    if (!job) return "Ready";
+    if (job.status === "success") return "Update completed";
+    if (job.status === "failed") return "Update failed";
+    if (job.phase === "backup") return "Backing up database";
+    if (job.phase === "pull") return "Fetching release files";
+    if (job.phase === "build") return "Building containers";
+    if (job.phase === "switch") return "Switching services";
+    if (job.phase === "health") return "Checking service health";
+    if (job.phase === "cleanup") return "Cleaning up images";
+    return "Preparing update";
+  });
 
   async function checkLatest() {
     if (!token) return;
@@ -90,10 +121,22 @@
       </Card.Header>
       <Card.Content class="space-y-4">
         {#if latest}
-          <div class="rounded-lg border p-4">
-            <p class="font-medium">{latest.name}</p>
-            <p class="mt-1 text-sm text-muted-foreground">Current: {latest.currentVersion} / Latest: {latest.latestVersion}</p>
-            <p class="mt-1 text-xs text-muted-foreground">Published {timeAgo(latest.publishedAt)}</p>
+          <div class="space-y-4 rounded-lg border p-4">
+            <div>
+              <p class="font-medium">{latest.name}</p>
+              <p class="mt-1 text-sm text-muted-foreground">Current: {latest.currentVersion} / Latest: {latest.latestVersion}</p>
+              <p class="mt-1 text-xs text-muted-foreground">Published {timeAgo(latest.publishedAt)}</p>
+            </div>
+            {#if job}
+              <div class="space-y-2 rounded-lg bg-muted/40 p-3">
+                <div class="flex items-center justify-between gap-3 text-sm">
+                  <span class="font-medium">{updateLabel}</span>
+                  <span class="text-xs text-muted-foreground">{updateProgress}%</span>
+                </div>
+                <Progress value={updateProgress} max={100} />
+                <p class="text-xs text-muted-foreground">Status: {job.status}{job.phase ? ` / ${job.phase}` : ""}</p>
+              </div>
+            {/if}
           </div>
         {/if}
         <div class="flex flex-wrap gap-2">
@@ -115,16 +158,5 @@
       </Card.Content>
     </Card.Root>
 
-    {#if job}
-      <Card.Root>
-        <Card.Header>
-          <Card.Title>Update progress</Card.Title>
-          <Card.Description>Status: {job.status} {job.phase ? ` / ${job.phase}` : ""}</Card.Description>
-        </Card.Header>
-        <Card.Content>
-          <pre class="max-h-[480px] overflow-auto rounded-lg bg-zinc-950 p-4 text-xs text-zinc-100"><code>{job.logs || "Waiting for logs..."}</code></pre>
-        </Card.Content>
-      </Card.Root>
-    {/if}
   </div>
 </div>
