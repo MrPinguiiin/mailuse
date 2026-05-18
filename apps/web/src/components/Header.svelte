@@ -1,36 +1,37 @@
 <script lang="ts">
-  import { Mail } from "@lucide/svelte";
+  import { ArrowRight, Mail } from "@lucide/svelte";
 </script>
 
-<header
-  class="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 py-3"
->
-  <div class="container mx-auto max-w-5xl flex items-center justify-between">
+<header class="bg-[#FFF7E8] px-4 py-4 dark:bg-slate-950">
+  <div class="container mx-auto flex max-w-6xl items-center justify-between rounded-3xl border-4 border-slate-900 bg-white px-4 py-3 shadow-[6px_6px_0_#0f172a] dark:bg-slate-900 dark:shadow-[6px_6px_0_#f8fafc]">
     <a
       href="/"
-      class="flex items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100"
+      class="flex cursor-pointer items-center gap-2 text-lg font-black text-slate-950 transition-colors duration-200 hover:text-[#6366F1] dark:text-slate-100"
     >
-      <Mail class="h-5 w-5" />
+      <span class="rounded-2xl border-2 border-slate-900 bg-[#FFD166] p-2 text-slate-950">
+        <Mail class="h-4 w-4" />
+      </span>
       <span>mailuse</span>
     </a>
     <nav
-      class="flex items-center gap-4 text-sm text-zinc-600 dark:text-zinc-400"
+      class="flex items-center gap-3 text-sm font-black text-slate-700 dark:text-slate-300"
     >
       <a
         href="/#features"
-        class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+        class="hidden cursor-pointer transition-colors duration-200 hover:text-[#6366F1] sm:inline"
       >
         Features
       </a>
       <a
         href="/docs"
-        class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+        class="inline-flex cursor-pointer items-center gap-2 rounded-2xl border-2 border-slate-900 bg-[#22C55E] px-3 py-2 text-slate-950 transition-colors duration-200 hover:bg-[#86EFAC]"
       >
         Docs
+        <ArrowRight class="h-4 w-4" />
       </a>
       <a
         href="https://github.com/MrPinguiiin/mailuse"
-        class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+        class="hidden cursor-pointer transition-colors duration-200 hover:text-[#6366F1] sm:inline"
         target="_blank"
         rel="noreferrer"
       >

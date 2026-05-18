@@ -2,172 +2,285 @@
   import {
     ArrowRight,
     BookOpen,
+    CheckCircle2,
+    Clock3,
     Code2,
     Container,
     Inbox,
+    KeyRound,
     Mail,
+    MessageSquareHeart,
+    Rocket,
     Server,
     Shield,
+    Sparkles,
     TimerReset,
     Zap,
   } from "@lucide/svelte";
 
-  const features = [
+  const catalog = [
     {
-      title: "No auth required",
-      description: "Your users can generate disposable inboxes without sign-up forms, passwords, or friction.",
-      icon: Zap,
+      title: "Verification playground",
+      description: "Catch OTPs, magic links, and QA emails without creating real user accounts.",
+      icon: KeyRound,
+      color: "bg-[#FFD166]",
     },
     {
-      title: "Auto-expiring",
-      description: "Configure TTL and let old inboxes and emails clean themselves up automatically.",
-      icon: TimerReset,
+      title: "Campaign sandbox",
+      description: "Preview newsletters and product emails in throwaway inboxes before they touch customers.",
+      icon: Mail,
+      color: "bg-[#8AE9C1]",
     },
     {
-      title: "Zero tracking",
-      description: "Designed for privacy-first deployments. No analytics or account system required by default.",
-      icon: Shield,
-    },
-    {
-      title: "Built-in SMTP",
-      description: "Run the receiver on your VPS and accept inbound email directly through port 25.",
-      icon: Server,
-    },
-    {
-      title: "Owner dashboard",
-      description: "Monitor inboxes and emails, then generate an owner API token from a private dashboard.",
+      title: "API lab",
+      description: "Create inboxes, read messages, and automate test flows with a simple REST API.",
       icon: Code2,
+      color: "bg-[#A5B4FC]",
+    },
+  ];
+
+  const progressSteps = [
+    { label: "SMTP receiver online", value: "100%", width: "w-full", color: "bg-[#22C55E]" },
+    { label: "Inbox TTL cleanup", value: "82%", width: "w-10/12", color: "bg-[#F97316]" },
+    { label: "Owner dashboard setup", value: "64%", width: "w-8/12", color: "bg-[#6366F1]" },
+  ];
+
+  const features = [
+    { title: "No auth maze", description: "Visitors can create disposable inboxes without sign-up friction.", icon: Zap },
+    { title: "Auto-expiring mail", description: "Configure TTLs so stale inboxes and messages clean themselves up.", icon: TimerReset },
+    { title: "Self-hosted stack", description: "Run Web, API, SMTP, Postgres, and MinIO under your own domain.", icon: Server },
+    { title: "Privacy-first defaults", description: "No tracking layer, no external inbox dependency, and operator-owned data.", icon: Shield },
+  ];
+
+  const testimonials = [
+    {
+      quote: "mailuse made our auth testing feel like a tiny lab instead of a spreadsheet of disposable accounts.",
+      name: "Nadia",
+      role: "QA Lead",
     },
     {
-      title: "Docker-ready",
-      description: "Ship a complete stack with API, Web, SMTP, Postgres, and MinIO using Docker Compose.",
-      icon: Container,
+      quote: "The VPS setup keeps email data close, while the public inbox UI stays simple enough for the whole team.",
+      name: "Rafi",
+      role: "Indie SaaS builder",
+    },
+    {
+      quote: "We use it like a training ground for onboarding developers into email flows and webhook tests.",
+      name: "Mika",
+      role: "Platform Engineer",
     },
   ];
 </script>
 
 <svelte:head>
-  <title>mailuse - Self-hosted disposable email</title>
+  <title>mailuse - Playful self-hosted disposable email</title>
   <meta
     name="description"
-    content="mailuse is a self-hosted disposable email service with SMTP ingest, REST API, and SvelteKit dashboard."
+    content="mailuse is a self-hosted disposable email service with SMTP ingest, REST API, public inbox UI, and private owner dashboard."
   />
 </svelte:head>
 
-<div class="overflow-hidden">
-  <section class="relative border-b border-zinc-200 dark:border-zinc-800">
-    <div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(24,24,27,0.08),transparent_28%),radial-gradient(circle_at_80%_0%,rgba(63,63,70,0.08),transparent_30%)] dark:bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_28%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.06),transparent_30%)]"></div>
-    <div class="container mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:py-24 lg:grid-cols-[1.02fr_0.98fr]">
+<div class="overflow-hidden bg-[#FFF7E8] text-slate-950 dark:bg-slate-950 dark:text-slate-50">
+  <section class="relative isolate">
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_18%,rgba(251,113,133,0.35),transparent_26%),radial-gradient(circle_at_82%_10%,rgba(34,197,94,0.28),transparent_26%),radial-gradient(circle_at_50%_82%,rgba(99,102,241,0.22),transparent_30%)]"></div>
+    <div class="container mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:py-24 lg:grid-cols-[1fr_0.92fr]">
       <div>
-        <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-zinc-600 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-          v0.1.0 is building
+        <div class="mb-6 inline-flex items-center gap-2 rounded-full border-4 border-slate-900 bg-white px-4 py-2 text-xs font-black uppercase tracking-widest shadow-[6px_6px_0_#0f172a] dark:bg-slate-900 dark:shadow-[6px_6px_0_#f8fafc]">
+          <Sparkles class="h-4 w-4 text-[#F97316]" /> Self-hosted inbox lab
         </div>
 
-        <h1 class="max-w-3xl text-6xl font-black uppercase leading-[0.88] tracking-tight text-zinc-950 dark:text-zinc-50 sm:text-7xl lg:text-8xl">
-          Privacy is disposable.
+        <h1 class="max-w-4xl text-5xl font-black leading-[0.94] tracking-tight sm:text-7xl lg:text-8xl">
+          Make disposable email feel playful, private, and yours.
         </h1>
 
-        <p class="mt-6 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-          mailuse is an open-source disposable email kit for people who want to run the inbox service on their own VPS. Deploy the SMTP receiver, REST API, public inbox UI, and private owner dashboard under your own domain.
+        <p class="mt-6 max-w-2xl text-lg font-medium leading-8 text-slate-700 dark:text-slate-300">
+          mailuse turns temporary inboxes into a friendly testing playground for teams. Catch verification codes, preview email flows, and run the full SMTP stack on your own VPS.
         </p>
 
         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
           <a
             href="/docs"
-            class="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
+            class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border-4 border-slate-900 bg-[#22C55E] px-6 py-4 text-sm font-black text-slate-950 shadow-[6px_6px_0_#0f172a] transition-colors duration-200 hover:bg-[#86EFAC] focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#6366F1]"
           >
-            See docs
+            Start with docs
             <ArrowRight class="h-4 w-4" />
           </a>
           <a
             href="https://github.com/MrPinguiiin/mailuse"
             target="_blank"
             rel="noreferrer"
-            class="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 py-3 text-sm font-semibold text-zinc-800 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-600"
+            class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border-4 border-slate-900 bg-white px-6 py-4 text-sm font-black text-slate-950 shadow-[6px_6px_0_#0f172a] transition-colors duration-200 hover:bg-[#FFD166] focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#6366F1]"
           >
-            GitHub
+            View GitHub
             <BookOpen class="h-4 w-4" />
           </a>
         </div>
       </div>
 
-      <div class="rounded-3xl border border-zinc-200 bg-white p-4 shadow-2xl shadow-zinc-200/70 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/30">
-        <div class="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
-          <div class="mb-4 flex items-center justify-between">
+      <div class="rounded-[2rem] border-4 border-slate-900 bg-[#A5B4FC] p-4 shadow-[12px_12px_0_#0f172a]">
+        <div class="rounded-[1.5rem] border-4 border-slate-900 bg-white p-4 shadow-[inset_-5px_-5px_0_rgba(15,23,42,0.08)]">
+          <div class="mb-4 flex items-center justify-between gap-4">
             <div>
-              <p class="text-xs font-medium uppercase tracking-wide text-zinc-500">Disposable inbox</p>
-              <p class="mt-1 font-mono text-sm font-semibold text-zinc-950 dark:text-zinc-50">test@yourdomain.com</p>
+              <p class="text-xs font-black uppercase tracking-widest text-slate-500">Live inbox demo</p>
+              <p class="mt-1 font-mono text-sm font-black text-slate-950">demo@yourdomain.com</p>
             </div>
-            <span class="rounded-full bg-zinc-950 px-3 py-1 text-xs text-white dark:bg-zinc-50 dark:text-zinc-950">Self-hosted</span>
+            <span class="rounded-full border-2 border-slate-900 bg-[#8AE9C1] px-3 py-1 text-xs font-black text-slate-950">59:59 TTL</span>
           </div>
 
           <div class="space-y-3">
-            <div class="rounded-xl bg-white p-4 shadow-sm dark:bg-zinc-950">
-              <div class="mb-2 flex items-center justify-between text-xs text-zinc-500">
-                <span>FROM: Verification Bot</span>
+            <div class="rounded-3xl border-4 border-slate-900 bg-[#FFF7E8] p-4 shadow-[5px_5px_0_#0f172a]">
+              <div class="mb-3 flex items-center justify-between text-xs font-bold text-slate-600">
+                <span>Verification Bot</span>
                 <span>12:04 PM</span>
               </div>
-              <p class="text-sm text-zinc-800 dark:text-zinc-200">Your temporary verification code is:</p>
-              <p class="mt-2 font-mono text-2xl font-bold tracking-widest text-zinc-950 dark:text-zinc-50">892-113</p>
+              <p class="text-sm font-semibold text-slate-700">Your temporary verification code is:</p>
+              <p class="mt-2 font-mono text-3xl font-black tracking-widest text-slate-950">892-113</p>
             </div>
-            <div class="rounded-xl bg-white p-4 shadow-sm dark:bg-zinc-950">
-              <div class="mb-2 flex items-center justify-between text-xs text-zinc-500">
-                <span>FROM: Newsletter</span>
-                <span>11:58 AM</span>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div class="rounded-3xl border-4 border-slate-900 bg-[#FFD166] p-4 shadow-[5px_5px_0_#0f172a]">
+                <Clock3 class="mb-3 h-5 w-5" />
+                <p class="text-sm font-black">Auto cleanup</p>
+                <p class="mt-1 text-xs font-semibold text-slate-700">Old inboxes expire without manual chores.</p>
               </div>
-              <p class="text-sm text-zinc-800 dark:text-zinc-200">Welcome to the weekly digest...</p>
+              <div class="rounded-3xl border-4 border-slate-900 bg-[#8AE9C1] p-4 shadow-[5px_5px_0_#0f172a]">
+                <Shield class="mb-3 h-5 w-5" />
+                <p class="text-sm font-black">Owned data</p>
+                <p class="mt-1 text-xs font-semibold text-slate-700">SMTP and storage stay on your server.</p>
+              </div>
             </div>
-          </div>
-
-          <div class="mt-4 rounded-xl border border-zinc-200 bg-white p-3 text-center text-xs font-medium text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
-            Inbox expires in 59:59
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="border-b border-zinc-200 bg-zinc-950 py-3 text-zinc-50 dark:border-zinc-800">
-    <div class="container mx-auto flex max-w-6xl flex-wrap justify-center gap-x-6 gap-y-2 px-4 text-xs font-semibold uppercase tracking-widest text-zinc-300">
-      <span>Open source</span>
-      <span>MIT license</span>
-      <span>Docker ready</span>
-      <span>No tracking</span>
-      <span>Self hosted</span>
-      <span>Owner dashboard</span>
+  <div class="border-y-4 border-slate-900 bg-slate-950 py-4 text-slate-50">
+    <div class="container mx-auto flex max-w-6xl flex-wrap justify-center gap-x-8 gap-y-2 px-4 text-xs font-black uppercase tracking-widest">
+      <span>Open source</span><span>Docker ready</span><span>SMTP ingest</span><span>No tracking</span><span>Owner dashboard</span>
     </div>
   </div>
 
   <section id="features" class="container mx-auto max-w-6xl px-4 py-16 sm:py-20">
-    <div class="mb-10">
-      <p class="mb-2 text-sm font-semibold uppercase tracking-widest text-zinc-500">Batteries included</p>
-      <h2 class="text-4xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Everything an operator needs.</h2>
+    <div class="mb-10 max-w-2xl">
+      <p class="mb-2 text-sm font-black uppercase tracking-widest text-[#F97316]">Course catalog preview</p>
+      <h2 class="text-4xl font-black tracking-tight sm:text-5xl">Pick an inbox adventure.</h2>
+      <p class="mt-4 font-medium leading-7 text-slate-700 dark:text-slate-300">A playful catalog-style overview for the real mailuse workflows your team can run every day.</p>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-5 md:grid-cols-3">
+      {#each catalog as item}
+        {@const Icon = item.icon}
+        <article class="rounded-[1.75rem] border-4 border-slate-900 {item.color} p-6 shadow-[8px_8px_0_#0f172a] transition-colors duration-200 hover:bg-white">
+          <Icon class="mb-5 h-8 w-8" />
+          <h3 class="text-xl font-black">{item.title}</h3>
+          <p class="mt-3 text-sm font-semibold leading-6 text-slate-700">{item.description}</p>
+        </article>
+      {/each}
+    </div>
+  </section>
+
+  <section class="border-y-4 border-slate-900 bg-white dark:bg-slate-900">
+    <div class="container mx-auto grid max-w-6xl gap-8 px-4 py-16 lg:grid-cols-[0.9fr_1.1fr]">
+      <div>
+        <p class="mb-2 text-sm font-black uppercase tracking-widest text-[#6366F1]">Progress tracking demo</p>
+        <h2 class="text-4xl font-black tracking-tight sm:text-5xl">See your mail stack level up.</h2>
+        <p class="mt-4 font-medium leading-7 text-slate-700 dark:text-slate-300">Use the owner dashboard to understand inbox activity, service health, and cleanup progress without turning operations into homework.</p>
+      </div>
+
+      <div class="rounded-[2rem] border-4 border-slate-900 bg-[#FFF7E8] p-5 shadow-[10px_10px_0_#0f172a]">
+        <div class="mb-5 flex items-center justify-between rounded-2xl border-4 border-slate-900 bg-[#FDE68A] p-4">
+          <div>
+            <p class="text-xs font-black uppercase tracking-widest text-slate-600">Operator score</p>
+            <p class="text-3xl font-black">Level 4</p>
+          </div>
+          <Rocket class="h-10 w-10 text-[#F97316]" />
+        </div>
+        <div class="space-y-4">
+          {#each progressSteps as step}
+            <div>
+              <div class="mb-2 flex items-center justify-between text-sm font-black">
+                <span>{step.label}</span>
+                <span>{step.value}</span>
+              </div>
+              <div class="h-5 rounded-full border-4 border-slate-900 bg-white p-0.5">
+                <div class="h-full rounded-full {step.width} {step.color}"></div>
+              </div>
+            </div>
+          {/each}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container mx-auto max-w-6xl px-4 py-16 sm:py-20">
+    <div class="mb-10 max-w-2xl">
+      <p class="mb-2 text-sm font-black uppercase tracking-widest text-[#22C55E]">Clay cards, real features</p>
+      <h2 class="text-4xl font-black tracking-tight sm:text-5xl">Friendly on the surface. Serious underneath.</h2>
+    </div>
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {#each features as feature}
         {@const Icon = feature.icon}
-        <div class="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <Icon class="mb-4 h-5 w-5 text-zinc-500" />
-          <h3 class="mb-2 font-semibold text-zinc-950 dark:text-zinc-50">{feature.title}</h3>
-          <p class="text-sm leading-6 text-zinc-600 dark:text-zinc-400">{feature.description}</p>
+        <div class="rounded-[1.75rem] border-4 border-slate-900 bg-white p-5 shadow-[7px_7px_0_#0f172a] dark:bg-slate-900">
+          <Icon class="mb-4 h-6 w-6 text-[#6366F1]" />
+          <h3 class="font-black">{feature.title}</h3>
+          <p class="mt-2 text-sm font-medium leading-6 text-slate-700 dark:text-slate-300">{feature.description}</p>
         </div>
       {/each}
     </div>
   </section>
 
-  <section class="border-y border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50">
-    <div class="container mx-auto grid max-w-6xl gap-8 px-4 py-16 lg:grid-cols-[0.8fr_1.2fr]">
-      <div>
-        <p class="mb-2 text-sm font-semibold uppercase tracking-widest text-zinc-500">Ready to deploy?</p>
-        <h2 class="text-4xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Install it on your VPS.</h2>
-        <p class="mt-4 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          The public website only hosts documentation. The actual inbox service runs on your server so SMTP, data, owner dashboard, and storage stay under your control.
+  <section class="border-y-4 border-slate-900 bg-[#A5B4FC]">
+    <div class="container mx-auto max-w-6xl px-4 py-16">
+      <div class="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+          <p class="mb-2 text-sm font-black uppercase tracking-widest text-slate-800">Student testimonials</p>
+          <h2 class="text-4xl font-black tracking-tight sm:text-5xl">Teams learn faster with throwaway inboxes.</h2>
+        </div>
+        <MessageSquareHeart class="hidden h-12 w-12 sm:block" />
+      </div>
+      <div class="grid gap-5 md:grid-cols-3">
+        {#each testimonials as testimonial}
+          <figure class="rounded-[1.75rem] border-4 border-slate-900 bg-white p-6 shadow-[8px_8px_0_#0f172a]">
+            <blockquote class="text-sm font-bold leading-7 text-slate-800">"{testimonial.quote}"</blockquote>
+            <figcaption class="mt-5 border-t-4 border-slate-900 pt-4">
+              <p class="font-black">{testimonial.name}</p>
+              <p class="text-sm font-semibold text-slate-600">{testimonial.role}</p>
+            </figcaption>
+          </figure>
+        {/each}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-[#FFF7E8] py-4 dark:bg-slate-950">
+    <div class="container mx-auto grid max-w-6xl items-stretch gap-6 px-4 py-16 lg:grid-cols-[0.88fr_1.12fr]">
+      <div class="relative rounded-[2rem] border-4 border-slate-900 bg-white p-6 shadow-[10px_10px_0_#0f172a] dark:bg-slate-900 sm:p-8">
+        <div class="absolute -right-3 -top-3 hidden rounded-2xl border-4 border-slate-900 bg-[#FFD166] p-3 shadow-[5px_5px_0_#0f172a] sm:block">
+          <Server class="h-7 w-7 text-slate-950" />
+        </div>
+        <p class="mb-4 inline-flex rounded-full border-2 border-slate-900 bg-[#FFE8A3] px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-950">
+          Ready to deploy?
         </p>
+        <h2 class="max-w-lg text-4xl font-black leading-none tracking-tight sm:text-5xl">Install it on your VPS.</h2>
+        <p class="mt-5 max-w-xl text-base font-semibold leading-7 text-slate-700 dark:text-slate-300">
+          The public website only hosts documentation. The actual inbox service runs on your server, so SMTP, data, owner dashboard, and storage stay under your control.
+        </p>
+        <div class="mt-6 rounded-3xl border-4 border-slate-900 bg-[#8AE9C1] p-4 text-slate-950 shadow-[6px_6px_0_#0f172a]">
+          <div class="flex items-start gap-3">
+            <span class="rounded-2xl border-2 border-slate-900 bg-white p-2">
+              <CheckCircle2 class="h-5 w-5" />
+            </span>
+            <div>
+              <p class="font-black">Keep secrets persisted during updates.</p>
+              <p class="mt-1 text-sm font-semibold leading-6 text-slate-700">
+                Pass the same passwords and domain values when recreating the Docker stack.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="rounded-2xl border border-zinc-200 bg-zinc-950 p-5 text-zinc-100 dark:border-zinc-800">
-        <div class="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-zinc-400">
+      <div class="rounded-[2rem] border-4 border-slate-900 bg-slate-950 p-5 text-slate-100 shadow-[10px_10px_0_#6366f1] sm:p-6">
+        <div class="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#8AE9C1]">
           <Container class="h-4 w-4" /> Docker quick start
         </div>
         <pre class="overflow-x-auto text-sm leading-7"><code>mkdir -p ~/mailuse-install
@@ -178,13 +291,26 @@ DOMAIN=yourdomain.com OWNER_PASSWORD='change-this-owner-password' LETSENCRYPT_EM
     </div>
   </section>
 
-  <footer class="container mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
-    <div class="flex items-center gap-2 font-semibold text-zinc-900 dark:text-zinc-100">
+  <section class="border-y-4 border-slate-900 bg-[#22C55E]">
+    <div class="container mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-4 py-12 sm:flex-row sm:items-center">
+      <div>
+        <p class="text-sm font-black uppercase tracking-widest text-slate-800">Enrollment CTA</p>
+        <h2 class="mt-2 text-4xl font-black tracking-tight">Enroll your team in cleaner email testing.</h2>
+      </div>
+      <a href="/docs" class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border-4 border-slate-900 bg-white px-6 py-4 text-sm font-black text-slate-950 shadow-[6px_6px_0_#0f172a] transition-colors duration-200 hover:bg-[#FFD166] focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-white">
+        Read deployment guide
+        <ArrowRight class="h-4 w-4" />
+      </a>
+    </div>
+  </section>
+
+  <footer class="container mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 text-sm font-semibold text-slate-600 dark:text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-2 font-black text-slate-950 dark:text-slate-100">
       <Inbox class="h-4 w-4" /> mailuse
     </div>
     <div class="flex gap-4">
-      <a href="/docs" class="hover:text-zinc-900 dark:hover:text-zinc-100">Documentation</a>
-      <a href="https://github.com/MrPinguiiin/mailuse" target="_blank" rel="noreferrer" class="hover:text-zinc-900 dark:hover:text-zinc-100">GitHub</a>
+      <a href="/docs" class="transition-colors hover:text-slate-950 dark:hover:text-slate-100">Documentation</a>
+      <a href="https://github.com/MrPinguiiin/mailuse" target="_blank" rel="noreferrer" class="transition-colors hover:text-slate-950 dark:hover:text-slate-100">GitHub</a>
     </div>
   </footer>
 </div>

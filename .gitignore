@@ -22,6 +22,9 @@ packages/db/prisma/generated/
 # Turbo
 .turbo/
 
+# OpenCode local skill/config data
+apps/web/.opencode/
+
 # OS
 .DS_Store
 Thumbs.db
