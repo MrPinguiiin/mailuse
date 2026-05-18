@@ -125,7 +125,14 @@ async function executeUpdate(jobId: string, releaseTag: string) {
     await run(jobId, `docker image prune -f`);
     await prisma.updateJob.update({
       where: { id: jobId },
-      data: { status: "success", phase: "done", completedAt: new Date(), durationSeconds: Math.floor((Date.now() - started) / 1000) },
+      data: {
+        status: "success",
+        phase: "done",
+        completedAt: new Date(),
+        durationSeconds: Math.floor((Date.now() - started) / 1000),
+        errorMessage: null,
+        errorStack: null,
+      },
     });
     await appendLog(jobId, "Update completed successfully");
     await appendLog(jobId, "Scheduling updater self-update");
@@ -148,7 +155,10 @@ async function executeRollback(jobId: string, sourceJobId: string) {
     await run(jobId, `docker exec -i mailuse-install-postgres-1 psql -U mailuse mailuse < ${source.backupPath}`);
     await run(jobId, `test -f docker-compose.yml.previous && mv docker-compose.yml.previous docker-compose.yml && ${composeUpAppServices(source.fromVersion)} || ${composeUpAppServices(source.fromVersion)}`);
     await healthCheck(jobId);
-    await prisma.updateJob.update({ where: { id: jobId }, data: { status: "success", phase: "done", completedAt: new Date() } });
+    await prisma.updateJob.update({
+      where: { id: jobId },
+      data: { status: "success", phase: "done", completedAt: new Date(), errorMessage: null, errorStack: null },
+    });
     await run(jobId, composeUpUpdaterInBackground(source.fromVersion));
   } catch (error: any) {
     await prisma.updateJob.update({ where: { id: jobId }, data: { status: "failed", errorMessage: error.message, errorStack: error.stack, completedAt: new Date() } });

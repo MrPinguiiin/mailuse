@@ -66,7 +66,7 @@
                       <p class="text-xs text-muted-foreground">Status: {job.status}{job.phase ? ` / ${job.phase}` : ""}</p>
                     </div>
                   {/if}
-                  {#if job.errorMessage}<p class="mt-2 text-sm text-red-600">{job.errorMessage}</p>{/if}
+                  {#if job.status === "failed" && job.errorMessage}<p class="mt-2 text-sm text-red-600">{job.errorMessage}</p>{/if}
                 </div>
                 {#if job.status === "success" && job.backupPath}
                   <Button size="sm" variant="outline" onclick={() => rollback(job.id)}>Rollback</Button>
