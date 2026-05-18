@@ -4,7 +4,7 @@
   import * as Card from "$lib/components/ui/card";
   import { Badge } from "$lib/components/ui/badge";
   import { timeAgo } from "$lib/utils";
-  import { BarChart3, Inbox, Lock, Mail, RefreshCw, ShieldCheck } from "lucide-svelte";
+  import { BarChart3, Inbox, Lock, Mail, RefreshCw, ShieldCheck } from "@lucide/svelte";
   import { onMount } from "svelte";
 
   const TOKEN_KEY = "mailuse:owner-token";

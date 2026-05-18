@@ -3,7 +3,7 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import * as Sidebar from "$lib/components/ui/sidebar";
-  import { BarChart3, Globe2, History, KeyRound, LogOut, RefreshCw } from "lucide-svelte";
+  import { BarChart3, Globe2, History, KeyRound, LogOut, RefreshCw } from "@lucide/svelte";
   import { onMount } from "svelte";
 
   let { children } = $props();

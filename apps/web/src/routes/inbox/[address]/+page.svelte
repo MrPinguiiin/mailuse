@@ -11,7 +11,7 @@
   import { forgetInbox, rememberInbox } from "$lib/recent-inboxes";
   import { cn } from "$lib/utils";
   import { timeAgo, formatBytes, timeRemaining } from "$lib/utils";
-  import { Check, Clock, Copy, Inbox, Mail, RefreshCw, ShieldCheck, Trash2, Zap } from "lucide-svelte";
+  import { Check, Clock, Copy, Inbox, Mail, RefreshCw, ShieldCheck, Trash2, Zap } from "@lucide/svelte";
   import { POLLING_INTERVAL_MS } from "@mailuse/shared/constants";
   import type { Inbox as InboxType, EmailSummary } from "@mailuse/shared/types";
 

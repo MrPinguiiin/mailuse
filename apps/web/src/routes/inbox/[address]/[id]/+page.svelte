@@ -5,7 +5,7 @@
   import { buttonVariants } from "$lib/components/ui/button";
   import { api } from "$lib/api";
   import { cn, timeAgo, formatBytes } from "$lib/utils";
-  import { ArrowLeft, Trash2, Paperclip, Download, FileText, Code, List } from "lucide-svelte";
+  import { ArrowLeft, Trash2, Paperclip, Download, FileText, Code, List } from "@lucide/svelte";
   import type { EmailDetail } from "@mailuse/shared/types";
 
   const address = $derived(decodeURIComponent(page.params.address));

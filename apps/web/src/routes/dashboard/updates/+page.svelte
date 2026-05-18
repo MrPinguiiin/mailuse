@@ -6,7 +6,7 @@
   import { Progress } from "$lib/components/ui/progress";
   import { getUpdateLabel, getUpdateProgress } from "$lib/update-progress";
   import { timeAgo } from "$lib/utils";
-  import { ExternalLink, RefreshCw, Rocket } from "lucide-svelte";
+  import { ExternalLink, RefreshCw, Rocket } from "@lucide/svelte";
   import { onMount } from "svelte";
 
   const TOKEN_KEY = "mailuse:owner-token";

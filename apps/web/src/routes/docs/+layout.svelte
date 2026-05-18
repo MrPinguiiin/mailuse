@@ -10,7 +10,7 @@
     Rocket,
     Search,
     Server,
-  } from "lucide-svelte";
+  } from "@lucide/svelte";
 
   const groups = [
     {

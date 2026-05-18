@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BookOpen, Cloud, Code2, Container, Globe2, Server } from "lucide-svelte";
+  import { BookOpen, Cloud, Code2, Container, Globe2, Server } from "@lucide/svelte";
 
   const cards = [
     {

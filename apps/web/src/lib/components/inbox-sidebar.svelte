@@ -4,7 +4,7 @@
   import { Button } from "$lib/components/ui/button";
   import { getRecentInboxes, rememberInbox, type RecentInbox } from "$lib/recent-inboxes";
   import { timeRemaining } from "$lib/utils";
-  import { Inbox, Mail, Plus, Search } from "lucide-svelte";
+  import { Inbox, Mail, Plus, Search } from "@lucide/svelte";
   import { onMount } from "svelte";
 
   let { domain, activeAddress = "" }: { domain: string; activeAddress?: string } = $props();
