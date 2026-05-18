@@ -11,6 +11,7 @@ const LOGIN_WINDOW_MS = 10 * 60 * 1000;
 const MAX_LOGIN_ATTEMPTS = 5;
 const GITHUB_RELEASE_URL = "https://api.github.com/repos/MrPinguiiin/mailuse/releases/latest";
 const UPDATER_URL = process.env.UPDATER_URL || "http://updater:3010";
+const STALE_UPDATE_MS = 10 * 60 * 1000;
 
 function ownerToken() {
   const secret = env.OWNER_PASSWORD || "";
@@ -182,8 +183,27 @@ ownerRoutes.post("/owner/update/trigger", async (c) => {
   if (!latest.ok) return c.json({ error: "Failed to fetch latest release" }, 502);
   const release = await latest.json();
 
-  const running = await prisma.updateJob.findFirst({ where: { status: { in: ["pending", "running"] } } });
-  if (running) return c.json({ error: "Update already in progress", jobId: running.id }, 409);
+  const running = await prisma.updateJob.findFirst({
+    where: { status: { in: ["pending", "running"] } },
+    orderBy: { startedAt: "desc" },
+  });
+
+  if (running) {
+    const ageMs = Date.now() - running.startedAt.getTime();
+    if (ageMs < STALE_UPDATE_MS) {
+      return c.json({ error: "Update already in progress", jobId: running.id }, 409);
+    }
+
+    await prisma.updateJob.updateMany({
+      where: { status: { in: ["pending", "running"] } },
+      data: {
+        status: "failed",
+        completedAt: new Date(),
+        errorMessage: "Marked failed automatically because the updater job became stale",
+      },
+    });
+    await prisma.updateLock.deleteMany({});
+  }
 
   const job = await prisma.updateJob.create({
     data: {
