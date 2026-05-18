@@ -115,6 +115,7 @@
           <div>
             <Card.Title>{latest?.updateAvailable ? "Update available" : "Release channel"}</Card.Title>
             <Card.Description>Updates are checked from the latest GitHub release, not commit hashes.</Card.Description>
+            <p class="mt-1 text-xs text-muted-foreground">Safe switch mode updates app services before refreshing the updater.</p>
           </div>
           <Badge variant={latest?.updateAvailable ? "secondary" : "outline"}>{latest?.latestVersion || "checking"}</Badge>
         </div>
